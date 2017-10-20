@@ -16,7 +16,7 @@
     "url": "https://github.com/vizlab/cyber-fieldwork-2017/issues"
   },
   "homepage": "https://github.com/vizlab/cyber-fieldwork-2017#readme",
-  "dependencies": {
+  "devDependencies": {
     "babel-core": "^6.26.0",
     "babel-loader": "^7.1.2",
     "babel-preset-env": "^1.6.1",
