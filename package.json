@@ -4,7 +4,8 @@
   "description": "",
   "main": "webpack.config.js",
   "scripts": {
-    "start": "webpack-dev-server --hot --open"
+    "start": "webpack-dev-server --hot --open",
+    "deploy": "gh-pages -d front/public"
   },
   "repository": {
     "type": "git",
@@ -15,11 +16,12 @@
   "bugs": {
     "url": "https://github.com/vizlab/cyber-fieldwork-2017/issues"
   },
-  "homepage": "https://github.com/vizlab/cyber-fieldwork-2017#readme",
+  "homepage": "https://cyber-fieldwork-2017.github.io",
   "devDependencies": {
     "babel-core": "^6.26.0",
     "babel-loader": "^7.1.2",
     "babel-preset-env": "^1.6.1",
+    "gh-pages": "^1.0.0",
     "webpack": "^3.8.1",
     "webpack-dev-server": "^2.9.2"
   }
