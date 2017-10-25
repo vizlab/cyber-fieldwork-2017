@@ -73,23 +73,35 @@
 fetch('u0.json').then(function (response) {
     return response.json();
 }).then(function (json) {
+    console.log('start!');
     draw(json);
+    console.log('over!');
 });
-console.log('a');
+
 function draw(vecArray) {
     var ctx = document.getElementById('app').getContext('2d');
-    for (var i = 0; i < 300; i++) {
-        for (var j = 0; j < 300; j++) {
-            console.log(vecArray[i][j]);
-            var color = getColor(vecArray[i][j]);
+    for (var i = 0; i < 100; i++) {
+        for (var j = 0; j < 100; j++) {
+            var str = getColor(vecArray[i][j]);
+            ctx.fillStyle = str;
+            ctx.fillRect(i * 5, j * 5, 5, 5);
         }
     }
 }
 
 function getColor(num) {
-    var low = 300;
-    var range = 400;
-    console.log(num);
+    var all = parseInt((num - 300) / 3);
+    var remain = num % 3;
+
+    var colorStr = 'rgb(' + all + ',';
+    if (num == 2) {
+        colorStr += all + 1 + ',' + (all + 1) + ')';
+    } else if (num == 1) {
+        colorStr += all + ',' + (all + 1) + ')';
+    } else {
+        colorStr += all + ',' + all + ')';
+    }
+    return colorStr;
 }
 
 /***/ })
