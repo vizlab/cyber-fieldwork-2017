@@ -79,13 +79,11 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 fetch('data.json').then(function (response) {
     return response.json();
 }).then(function (json) {
-    console.log(json[0]);
     console.log('start!');
-    draw(json[500]);
     var playIndex = 0;
     setInterval(function () {
-        playIndex += 10;
-        if (playIndex >= json.length) {
+        playIndex++;
+        if (playIndex === json.length) {
             playIndex = 0;
         }
         draw(json[playIndex]);
