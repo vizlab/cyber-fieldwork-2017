@@ -15,7 +15,8 @@ dx2, dy2 = dx*dx, dy*dy
 dt = dx2 * dy2 / (2 * D * (dx2 + dy2))
 
 u0 = Tcool * np.ones((nx, ny))
-u = np.empty((nx, ny))
+u = u0
+u[1:-1, 1:-1] = np.empty((nx-2, ny-2))
 
 #Initial conditions - ring of inner radius r, width dr centred at (cx, cy)(mm)
 r, cx, cy = 2, 5, 5
