@@ -10,6 +10,7 @@ fetch('data.json')
                 playIndex = 0;
             }
             draw(json[playIndex]);
+            draw3D(json[playIndex], playIndex);
             playIndex++;
       }, 50);
         console.log('over!');
@@ -32,18 +33,34 @@ function draw(vecArray) {
     }
 }
 
-//TODO: think a better color distribution
-function getColor(num) {
-    let all = parseInt((num-300) / 3);
-    let remain = num % 3;
+function draw3D(vecArray, playIndex) {
+  const data = [{
+    z: vecArray,
+    type: 'surface'
+  }];
 
-    let colorStr = 'rgb(' + all + ',';
-    if (num == 2) {
-        colorStr += (all+1) + ',' + (all+1) + ')';
-    } else if (num == 1) {
-        colorStr += all + ',' + (all+1) + ')';
-    } else {
-        colorStr += all + ',' + all + ')';
+  const layout = {
+    title: 'Diffusion Equation Simulation',
+    autosize: false,
+    width: 500,
+    height: 500,
+    yaxis: {
+      range: [0, 700],
+    },
+    margin: {
+      l: 35,
+      r: 20,
+      b: 35,
+      t: 60,
     }
-    return colorStr;
+  };
+
+  //TODO: if statement should be fixed because newPlot is called many times while animation
+  if (playIndex === 0) {
+    Plotly.newPlot('plotlyDiv', data, layout);
+    return;
+  }
+  const plotDiv = document.getElementById('plotlyDiv');
+  plotDiv.data = data;
+  Plotly.redraw('plotlyDiv');
 }
