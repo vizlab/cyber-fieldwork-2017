@@ -77,51 +77,68 @@ var _colormap2 = _interopRequireDefault(_colormap);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 fetch('data.json').then(function (response) {
-    return response.json();
+  return response.json();
 }).then(function (json) {
-    console.log('start!');
-    var playIndex = 0;
-    setInterval(function () {
-        playIndex++;
-        if (playIndex === json.length) {
-            playIndex = 0;
-        }
-        draw(json[playIndex]);
-    }, 50);
-    console.log('over!');
+  console.log('start!');
+  var playIndex = 0;
+  setInterval(function () {
+    if (playIndex === json.length) {
+      playIndex = 0;
+    }
+    draw(json[playIndex]);
+    draw3D(json[playIndex], playIndex);
+    playIndex++;
+  }, 50);
+  console.log('over!');
 });
 
 function draw(vecArray) {
-    var colors = (0, _colormap2.default)({
-        colormap: 'jet',
-        nshades: 701,
-        format: 'hex',
-        alpha: 1
-    });
-    var ctx = document.getElementById('app').getContext('2d');
-    for (var i = 0; i < 100; i++) {
-        for (var j = 0; j < 100; j++) {
-            // ctx.fillStyle = getColor(vecArray[i][j]);
-            ctx.fillStyle = colors[parseInt(vecArray[i][j])];
-            ctx.fillRect(i * 5, j * 5, 5, 5);
-        }
+  var colors = (0, _colormap2.default)({
+    colormap: 'jet',
+    nshades: 701,
+    format: 'hex',
+    alpha: 1
+  });
+  var ctx = document.getElementById('app').getContext('2d');
+  for (var i = 0; i < 100; i++) {
+    for (var j = 0; j < 100; j++) {
+      // ctx.fillStyle = getColor(vecArray[i][j]);
+      ctx.fillStyle = colors[parseInt(vecArray[i][j])];
+      ctx.fillRect(i * 5, j * 5, 5, 5);
     }
+  }
 }
 
-//TODO: think a better color distribution
-function getColor(num) {
-    var all = parseInt((num - 300) / 3);
-    var remain = num % 3;
+function draw3D(vecArray, playIndex) {
+  var data = [{
+    z: vecArray,
+    type: 'surface'
+  }];
 
-    var colorStr = 'rgb(' + all + ',';
-    if (num == 2) {
-        colorStr += all + 1 + ',' + (all + 1) + ')';
-    } else if (num == 1) {
-        colorStr += all + ',' + (all + 1) + ')';
-    } else {
-        colorStr += all + ',' + all + ')';
+  var layout = {
+    title: 'Diffusion Equation Simulation',
+    autosize: false,
+    width: 500,
+    height: 500,
+    yaxis: {
+      range: [0, 700]
+    },
+    margin: {
+      l: 35,
+      r: 20,
+      b: 35,
+      t: 60
     }
-    return colorStr;
+  };
+
+  //TODO: if statement should be fixed because newPlot is called many times while animation
+  if (playIndex === 0) {
+    Plotly.newPlot('plotlyDiv', data, layout);
+    return;
+  }
+  var plotDiv = document.getElementById('plotlyDiv');
+  plotDiv.data = data;
+  Plotly.redraw('plotlyDiv');
 }
 
 /***/ }),
