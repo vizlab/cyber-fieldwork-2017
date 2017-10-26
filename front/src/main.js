@@ -1,16 +1,32 @@
-fetch('u0.json')
+import colormap from 'colormap';
+
+fetch('data.json')
     .then(response => response.json())
     .then((json) => {
         console.log('start!');
-        draw(json);
+       let playIndex = 0;
+        setInterval(() => {
+            playIndex++;
+            if (playIndex === json.length) {
+                playIndex = 0;
+            }
+            draw(json[playIndex]);
+      }, 50);
         console.log('over!');
   });
 
 function draw(vecArray) {
+    const colors = colormap({
+        colormap: 'jet',
+        nshades: 701,
+        format: 'hex',
+        alpha: 1
+    });
     const ctx = document.getElementById('app').getContext('2d');
     for (let i = 0; i < 100; i++) {
         for (let j = 0; j < 100; j++) {
-            ctx.fillStyle = getColor(vecArray[i][j]);
+            // ctx.fillStyle = getColor(vecArray[i][j]);
+            ctx.fillStyle = colors[parseInt(vecArray[i][j])];
             ctx.fillRect(i*5, j*5, 5, 5);
         }
     }

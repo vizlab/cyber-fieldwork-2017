@@ -37,13 +37,14 @@ def do_timestep(u0, u):
     return u0, u
 
 #timeSteps
-tSteps = 101
+tSteps = 501
 
 dataList = []
 
 for time in range(tSteps):
     u0, u = do_timestep(u0, u)
-    dataList.append(u.tolist())
+    if time % 10 == 0:
+        dataList.append(u.tolist())
 
 filePath = '../../front/public/data.json'
 
