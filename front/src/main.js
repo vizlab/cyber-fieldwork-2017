@@ -6,11 +6,11 @@ fetch('data.json')
         console.log('start!');
        let playIndex = 0;
         setInterval(() => {
-            playIndex++;
             if (playIndex === json.length) {
                 playIndex = 0;
             }
             draw(json[playIndex]);
+            playIndex++;
       }, 50);
         console.log('over!');
   });
