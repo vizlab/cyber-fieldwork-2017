@@ -1,5 +1,22 @@
 import colormap from 'colormap';
 
+const layout = {
+  title: 'Diffusion Equation Simulation',
+  autosize: false,
+  width: 500,
+  height: 500,
+  yaxis: {
+    range: [0, 700],
+  },
+  margin: {
+    l: 35,
+    r: 20,
+    b: 35,
+    t: 60,
+  }
+};
+Plotly.newPlot('plotlyDiv', [], layout);
+
 fetch('data.json')
     .then(response => response.json())
     .then((json) => {
@@ -26,40 +43,18 @@ function draw(vecArray) {
     const ctx = document.getElementById('app').getContext('2d');
     for (let i = 0; i < 100; i++) {
         for (let j = 0; j < 100; j++) {
-            // ctx.fillStyle = getColor(vecArray[i][j]);
             ctx.fillStyle = colors[parseInt(vecArray[i][j])];
             ctx.fillRect(i*5, j*5, 5, 5);
         }
     }
 }
 
-function draw3D(vecArray, playIndex) {
+function draw3D(vecArray) {
   const data = [{
     z: vecArray,
     type: 'surface'
   }];
 
-  const layout = {
-    title: 'Diffusion Equation Simulation',
-    autosize: false,
-    width: 500,
-    height: 500,
-    yaxis: {
-      range: [0, 700],
-    },
-    margin: {
-      l: 35,
-      r: 20,
-      b: 35,
-      t: 60,
-    }
-  };
-
-  //TODO: if statement should be fixed because newPlot is called many times while animation
-  if (playIndex === 0) {
-    Plotly.newPlot('plotlyDiv', data, layout);
-    return;
-  }
   const plotDiv = document.getElementById('plotlyDiv');
   plotDiv.data = data;
   Plotly.redraw('plotlyDiv');
