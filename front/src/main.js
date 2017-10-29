@@ -66,25 +66,6 @@ fetch('data.json')
         console.log('over!');
     });
 
-fetch('u0.json')
-    .then(response => response.json())
-    .then((json) => {
-        console.log('paticular timestep');
-        const colors = colormap({
-            colormap: 'jet',
-            nshades: 701,
-            format: 'hex',
-            alpha: 1
-        });
-        const ctx = document.getElementById('single').getContext('2d');
-        for (let i = 0; i < 100; i++) {
-            for (let j = 0; j < 100; j++) {
-                ctx.fillStyle = colors[parseInt(json[i][j])];
-                ctx.fillRect(i*5, j*5, 5, 5);
-            }
-        }
-    });
-
 function draw(vecArray) {
     const colors = colormap({
         colormap: 'jet',

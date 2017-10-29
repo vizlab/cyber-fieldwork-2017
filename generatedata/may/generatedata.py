@@ -21,21 +21,12 @@ u = u0
 r, cx, cy = 2, 5, 5
 r2 = r**2
 
-
 #init conditions
 for i in range(nx):
     for j in range(ny):
         p2 = (i*dx-cx)**2 + (j*dy-cy)**2
         if p2 < r2:
             u0[i, j] = Thot
-
-
-#  filePath = '/home/may/workspace/cyber-fieldwork-2017/front/public/u0.json'
-
-#  with open(filePath, 'w') as outfile:
-    #  json.dump(u0.tolist(), outfile)
-
-#  exit()
 
 #main algorithm
 def do_timestep(u0, u):
