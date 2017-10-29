@@ -6,6 +6,11 @@ const layout = {
   width: 500,
   height: 500,
   scene: {
+    aspectratio: {
+      x: 1,
+      y: 1,
+      z: 1,
+    },
     xaxis: {
       range: [0, 100],
     },
