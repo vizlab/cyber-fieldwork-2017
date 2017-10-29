@@ -76,69 +76,119 @@ var _colormap2 = _interopRequireDefault(_colormap);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-fetch('data.json').then(function (response) {
-  return response.json();
-}).then(function (json) {
-  console.log('start!');
-  var playIndex = 0;
-  setInterval(function () {
-    if (playIndex === json.length) {
-      playIndex = 0;
-    }
-    draw(json[playIndex]);
-    draw3D(json[playIndex], playIndex);
-    playIndex++;
-  }, 50);
-  console.log('over!');
-});
-
-function draw(vecArray) {
-  var colors = (0, _colormap2.default)({
-    colormap: 'jet',
-    nshades: 701,
-    format: 'hex',
-    alpha: 1
-  });
-  var ctx = document.getElementById('app').getContext('2d');
-  for (var i = 0; i < 100; i++) {
-    for (var j = 0; j < 100; j++) {
-      // ctx.fillStyle = getColor(vecArray[i][j]);
-      ctx.fillStyle = colors[parseInt(vecArray[i][j])];
-      ctx.fillRect(i * 5, j * 5, 5, 5);
-    }
-  }
-}
-
-function draw3D(vecArray, playIndex) {
-  var data = [{
-    z: vecArray,
-    type: 'surface'
-  }];
-
-  var layout = {
+var layout = {
     title: 'Diffusion Equation Simulation',
     autosize: false,
     width: 500,
     height: 500,
-    yaxis: {
-      range: [0, 700]
+    scene: {
+        aspectratio: {
+            x: 1,
+            y: 1,
+            z: 1
+        },
+        xaxis: {
+            range: [0, 100]
+        },
+        yaxis: {
+            range: [0, 100]
+        },
+        zaxis: {
+            range: [0, 700]
+        },
+        camera: {
+            up: {
+                x: 0,
+                y: 0,
+                z: 0
+            },
+            center: {
+                x: 0,
+                y: 0,
+                z: 0
+            },
+            eye: {
+                x: -1.8,
+                y: -1.8,
+                z: 1.5
+            }
+        }
     },
     margin: {
-      l: 35,
-      r: 20,
-      b: 35,
-      t: 60
+        l: 35,
+        r: 20,
+        b: 35,
+        t: 60
     }
-  };
+};
 
-  //TODO: if statement should be fixed because newPlot is called many times while animation
-  if (playIndex === 0) {
-    Plotly.newPlot('plotlyDiv', data, layout);
-    return;
-  }
-  var plotDiv = document.getElementById('plotlyDiv');
-  plotDiv.data = data;
-  Plotly.redraw('plotlyDiv');
+Plotly.newPlot('plotlyDiv', [], layout);
+
+fetch('data.json').then(function (response) {
+    return response.json();
+}).then(function (json) {
+    console.log('start!');
+    var playIndex = 0;
+    setInterval(function () {
+        if (playIndex === json.length) {
+            playIndex = 0;
+        }
+        draw(json[playIndex]);
+        draw3D(json[playIndex]);
+        playIndex++;
+        console.log(playIndex);
+    }, 50);
+    console.log('over!');
+});
+
+fetch('u0.json').then(function (response) {
+    return response.json();
+}).then(function (json) {
+    console.log('paticular timestep');
+    var colors = (0, _colormap2.default)({
+        colormap: 'jet',
+        nshades: 701,
+        format: 'hex',
+        alpha: 1
+    });
+    var ctx = document.getElementById('single').getContext('2d');
+    for (var i = 0; i < 100; i++) {
+        for (var j = 0; j < 100; j++) {
+            ctx.fillStyle = colors[parseInt(json[i][j])];
+            ctx.fillRect(i * 5, j * 5, 5, 5);
+        }
+    }
+});
+
+function draw(vecArray) {
+    var colors = (0, _colormap2.default)({
+        colormap: 'jet',
+        nshades: 701,
+        format: 'hex',
+        alpha: 1
+    });
+    var ctx = document.getElementById('app').getContext('2d');
+    for (var i = 0; i < 100; i++) {
+        for (var j = 0; j < 100; j++) {
+            ctx.fillStyle = colors[parseInt(vecArray[i][j])];
+            ctx.fillRect(i * 5, j * 5, 5, 5);
+        }
+    }
+}
+
+function draw3D(vecArray) {
+    var data = [{
+        z: vecArray,
+        type: 'surface',
+        autocolorscale: false,
+        cauto: false,
+        cmax: 700,
+        cmin: 0
+    }];
+
+    var plotDiv = document.getElementById('plotlyDiv');
+    plotDiv.data = data;
+    Plotly.redraw('plotlyDiv');
 }
 
 /***/ }),
