@@ -5,8 +5,33 @@ const layout = {
   autosize: false,
   width: 500,
   height: 500,
-  yaxis: {
-    range: [0, 700],
+  scene: {
+    xaxis: {
+      range: [0, 100],
+    },
+    yaxis: {
+      range: [0, 100],
+    },
+    zaxis: {
+      range: [0, 700],
+    },
+    camera: {
+      up: {
+        x: 0,
+        y: 0,
+        z: 0
+      },
+      center: {
+        x: 0,
+        y: 0,
+        z: 0
+      },
+      eye: {
+        x: -1.8,
+        y: -1.8,
+        z: 1.5
+      }
+    }
   },
   margin: {
     l: 35,
@@ -15,6 +40,8 @@ const layout = {
     t: 60,
   }
 };
+
+
 Plotly.newPlot('plotlyDiv', [], layout);
 
 fetch('data.json')
@@ -27,8 +54,9 @@ fetch('data.json')
                 playIndex = 0;
             }
             draw(json[playIndex]);
-            draw3D(json[playIndex], playIndex);
+            draw3D(json[playIndex]);
             playIndex++;
+            console.log(playIndex);
       }, 50);
         console.log('over!');
   });
@@ -52,7 +80,11 @@ function draw(vecArray) {
 function draw3D(vecArray) {
   const data = [{
     z: vecArray,
-    type: 'surface'
+    type: 'surface',
+    autocolorscale: false,
+    cauto: false,
+    cmax: 700,
+    cmin: 0,
   }];
 
   const plotDiv = document.getElementById('plotlyDiv');
