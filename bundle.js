@@ -141,25 +141,6 @@ fetch('data.json').then(function (response) {
     console.log('over!');
 });
 
-fetch('u0.json').then(function (response) {
-    return response.json();
-}).then(function (json) {
-    console.log('paticular timestep');
-    var colors = (0, _colormap2.default)({
-        colormap: 'jet',
-        nshades: 701,
-        format: 'hex',
-        alpha: 1
-    });
-    var ctx = document.getElementById('single').getContext('2d');
-    for (var i = 0; i < 100; i++) {
-        for (var j = 0; j < 100; j++) {
-            ctx.fillStyle = colors[parseInt(json[i][j])];
-            ctx.fillRect(i * 5, j * 5, 5, 5);
-        }
-    }
-});
-
 function draw(vecArray) {
     var colors = (0, _colormap2.default)({
         colormap: 'jet',
