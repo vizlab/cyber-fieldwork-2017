@@ -55,18 +55,21 @@ const gradientFetch = fetch('gradient-fields.json').then(response => response.js
 Promise.all([scalarFetch, gradientFetch]).then((jsonList) => {
     const scalarFields = jsonList[0];
     const gradientFields = jsonList[1].data;
+    const xGradMax = jsonList[1].x_grad_max;
+    const yGradMax = jsonList[1].y_grad_max;
+
     let playIndex = 0;
     setInterval(() => {
         if (playIndex === scalarFields.length) {
             playIndex = 0;
         }
-        drawVector(scalarFields[playIndex], gradientFields[playIndex]);
+        drawVector(scalarFields[playIndex], gradientFields[playIndex], xGradMax, yGradMax);
         draw3D(scalarFields[playIndex]);
         playIndex++;
-    }, 50);
+    }, 500);
 });
 
-function drawVector(scalarField, gradientField) {
+function drawVector(scalarField, gradientField, xGradMax, yGradMax) {
     const colors = colormap({
         colormap: 'jet',
         nshades: 701,
@@ -76,12 +79,58 @@ function drawVector(scalarField, gradientField) {
     const canvas = document.getElementById('app');
     const ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.beginPath();
     for (let i = 0; i < 100; i++) {
         for (let j = 0; j < 100; j++) {
+            const x = i * 5;
+            const y = j * 5;
             ctx.fillStyle = colors[parseInt(scalarField[i][j])];
-            ctx.fillRect(i*5, j*5, 5, 5);
+            ctx.fillRect(x, y, 5, 5);
+            if (i % 5 === 0 && j % 5 ===0) {
+                const xGrad = gradientField.x[i][j];
+                const yGrad = gradientField.y[i][j];
+                const theta = Math.atan2(yGrad, xGrad);
+                const r = 200 * Math.sqrt(Math.pow(xGrad / xGradMax,2) + Math.pow(yGrad / yGradMax,2));
+                if (r < 1) {
+                    continue;
+                }
+                const p0 = {x: x, y: y};
+                const p1 = {x: x + r * Math.cos(theta), y: y + r * Math.sin(theta) };
+                drawLineWithArrowhead(p0, p1, 3, ctx);
+            }
         }
     }
+    ctx.stroke();
+}
+
+// ref: https://stackoverflow.com/questions/26804679/how-can-i-draw-arrows-on-a-canvas-with-mouse
+function drawLineWithArrowhead(p0,p1,headLength, ctx){
+    const degreesInRadians225 = 225 * Math.PI / 180;
+    const degreesInRadians135 = 135 * Math.PI / 180;
+
+    // calc the angle of the line
+    const dx = p1.x - p0.x;
+    const dy = p1.y - p0.y;
+    const angle = Math.atan2(dy, dx);
+
+    // calc arrowhead points
+    const x225 = p1.x + headLength * Math.cos(angle + degreesInRadians225);
+    const y225 = p1.y + headLength * Math.sin(angle + degreesInRadians225);
+    const x135 = p1.x + headLength * Math.cos(angle + degreesInRadians135);
+    const y135 = p1.y + headLength * Math.sin(angle + degreesInRadians135);
+
+    ctx.beginPath();
+    // draw the line from p0 to p1
+    ctx.moveTo(p0.x,p0.y);
+    ctx.lineTo(p1.x,p1.y);
+    // draw partial arrowhead at 225 degrees
+    ctx.moveTo(p1.x,p1.y);
+    ctx.lineTo(x225,y225);
+    // draw partial arrowhead at 135 degrees
+    ctx.moveTo(p1.x,p1.y);
+    ctx.lineTo(x135,y135);
+    // stroke the line and arrowhead
+    ctx.stroke();
 }
 
 function draw3D(vecArray) {
