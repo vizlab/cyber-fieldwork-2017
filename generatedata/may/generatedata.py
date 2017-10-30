@@ -1,5 +1,4 @@
 import numpy as np
-import matplotlib.pyplot as plt
 import json, codecs
 
 #Thermal diffusivity of steel
@@ -16,7 +15,7 @@ dt = dx2 * dy2 / (2 * D * (dx2 + dy2))
 
 u0 = Tcool * np.ones((nx, ny))
 u = u0
-u[1:-1, 1:-1] = np.empty((nx-2, ny-2))
+#  u[1:-1, 1:-1] = np.empty((nx-2, ny-2))
 
 #Initial conditions - ring of inner radius r, width dr centred at (cx, cy)(mm)
 r, cx, cy = 2, 5, 5
@@ -29,6 +28,7 @@ for i in range(nx):
         if p2 < r2:
             u0[i, j] = Thot
 
+#main algorithm
 def do_timestep(u0, u):
     u[1:-1, 1:-1] = u0[1:-1, 1:-1] + D * dt * (
           (u0[2:, 1:-1] - 2*u0[1:-1, 1:-1] + u0[:-2, 1:-1])/dx2
@@ -47,7 +47,7 @@ for time in range(tSteps):
     if time % 10 == 0:
         dataList.append(u.tolist())
 
-filePath = '../../front/public/data.json'
+filePath = './front/public/data.json'
 
 with open(filePath, 'w') as outfile:
     json.dump(dataList, outfile)
