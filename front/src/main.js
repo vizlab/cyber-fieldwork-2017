@@ -49,40 +49,36 @@ const layout = {
 
 Plotly.newPlot('plotlyDiv', [], layout);
 
-fetch('data.json')
-    .then(response => response.json())
-    .then((json) => {
-        console.log('start!');
-        let playIndex = 0;
-        setInterval(() => {
-            if (playIndex === json.length) {
-                playIndex = 0;
-            }
-            draw(json[playIndex]);
-            draw3D(json[playIndex]);
-            playIndex++;
-        }, 50);
-        console.log('over!');
-    });
+const scalarFetch = fetch('data.json').then(response => response.json());
+const gradientFetch = fetch('gradient-fields.json').then(response => response.json());
 
-fetch('gradient-fields.json')
-    .then(response => response.json())
-    .then((json) => {
-        const gradientFields = json;
-        console.log(gradientFields);
-    });
+Promise.all([scalarFetch, gradientFetch]).then((jsonList) => {
+    const scalarFields = jsonList[0];
+    const gradientFields = jsonList[1].data;
+    let playIndex = 0;
+    setInterval(() => {
+        if (playIndex === scalarFields.length) {
+            playIndex = 0;
+        }
+        drawVector(scalarFields[playIndex], gradientFields[playIndex]);
+        draw3D(scalarFields[playIndex]);
+        playIndex++;
+    }, 50);
+});
 
-function draw(vecArray) {
+function drawVector(scalarField, gradientField) {
     const colors = colormap({
         colormap: 'jet',
         nshades: 701,
         format: 'hex',
         alpha: 1
     });
-    const ctx = document.getElementById('app').getContext('2d');
+    const canvas = document.getElementById('app');
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
     for (let i = 0; i < 100; i++) {
         for (let j = 0; j < 100; j++) {
-            ctx.fillStyle = colors[parseInt(vecArray[i][j])];
+            ctx.fillStyle = colors[parseInt(scalarField[i][j])];
             ctx.fillRect(i*5, j*5, 5, 5);
         }
     }
