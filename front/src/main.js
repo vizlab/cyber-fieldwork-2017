@@ -61,9 +61,15 @@ fetch('data.json')
             draw(json[playIndex]);
             draw3D(json[playIndex]);
             playIndex++;
-            console.log(playIndex);
         }, 50);
         console.log('over!');
+    });
+
+fetch('gradient-fields.json')
+    .then(response => response.json())
+    .then((json) => {
+        const gradientFields = json;
+        console.log(gradientFields);
     });
 
 function draw(vecArray) {
