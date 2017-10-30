@@ -1,4 +1,5 @@
 import colormap from 'colormap';
+import $ from 'jquery';
 
 const layout = {
     title: 'Diffusion Equation Simulation',
@@ -52,7 +53,6 @@ Plotly.newPlot('plotlyDiv', [], layout);
 fetch('data.json')
     .then(response => response.json())
     .then((json) => {
-        console.log('start!');
         let playIndex = 0;
         setInterval(() => {
             if (playIndex === json.length) {
@@ -61,9 +61,7 @@ fetch('data.json')
             draw(json[playIndex]);
             draw3D(json[playIndex]);
             playIndex++;
-            console.log(playIndex);
         }, 50);
-        console.log('over!');
     });
 
 function draw(vecArray) {
