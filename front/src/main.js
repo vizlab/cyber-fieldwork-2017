@@ -81,9 +81,9 @@ function drawVector(scalarField, gradientField, xGradMax, yGradMax) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.beginPath();
     for (let i = 0; i < 100; i++) {
+        const y = i * 5;
         for (let j = 0; j < 100; j++) {
-            const x = i * 5;
-            const y = j * 5;
+            const x = j * 5;
             ctx.fillStyle = colors[parseInt(scalarField[i][j])];
             ctx.fillRect(x, y, 5, 5);
             if (i % 5 === 0 && j % 5 ===0) {
