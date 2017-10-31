@@ -1,5 +1,6 @@
 import colormap from 'colormap';
 import $ from 'jquery';
+import slider from 'bootstrap-slider';
 
 const layout = {
     title: 'Diffusion Equation Simulation',
@@ -47,6 +48,11 @@ const layout = {
     }
 };
 
+$('#ex6').slider({
+    formatter: function(value) {
+        return 'Current value: ' + value;
+    }
+});
 
 Plotly.newPlot('plotlyDiv', [], layout);
 
