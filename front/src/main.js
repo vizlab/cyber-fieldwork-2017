@@ -104,7 +104,7 @@ function drawVector(scalarField, gradientField, xGradMax, yGradMax) {
 }
 
 // ref: https://stackoverflow.com/questions/26804679/how-can-i-draw-arrows-on-a-canvas-with-mouse
-function drawLineWithArrowhead(p0,p1,headLength, ctx){
+function drawLineWithArrowhead(p0, p1, headLength, ctx){
     const degreesInRadians225 = 225 * Math.PI / 180;
     const degreesInRadians135 = 135 * Math.PI / 180;
 
@@ -121,14 +121,14 @@ function drawLineWithArrowhead(p0,p1,headLength, ctx){
 
     ctx.beginPath();
     // draw the line from p0 to p1
-    ctx.moveTo(p0.x,p0.y);
-    ctx.lineTo(p1.x,p1.y);
+    ctx.moveTo(p0.x, p0.y);
+    ctx.lineTo(p1.x, p1.y);
     // draw partial arrowhead at 225 degrees
-    ctx.moveTo(p1.x,p1.y);
-    ctx.lineTo(x225,y225);
+    ctx.moveTo(p1.x, p1.y);
+    ctx.lineTo(x225, y225);
     // draw partial arrowhead at 135 degrees
-    ctx.moveTo(p1.x,p1.y);
-    ctx.lineTo(x135,y135);
+    ctx.moveTo(p1.x, p1.y);
+    ctx.lineTo(x135, y135);
     // stroke the line and arrowhead
     ctx.stroke();
 }
