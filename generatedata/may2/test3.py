@@ -43,7 +43,7 @@ def mystencil(row, col):
 def boundary(row, col):
     if (len(row) == 1):
             fn = mystencil(49, col)
-    elif (len(row） == 50):
+    elif (len(row)==50):
             fn = mystencil(2,col)
     else:
         if (col == 1):
