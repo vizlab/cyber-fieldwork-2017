@@ -5,8 +5,8 @@ import matplotlib.pyplot as plt
 # from numpy import meshgrid, linspace
 import numpy as np
 
+def  adv_dif_2d(Usegpu, mesh_size, t):
 
-def adv_dif_2d(Usegpu, mesh_size, t):
     D = 1e-3  # 拡散係数
     u = 0.15  # x方向の速度
     v = 0.02  # y方向の速度
@@ -15,13 +15,16 @@ def adv_dif_2d(Usegpu, mesh_size, t):
     ly = 1.0  # 計算領域の全長(y)
     [x, y] = np.meshgrid(np.linspace(0, lx, mesh_size), np.linspace(0, ly, mesh_size))  # 座標マップを作成
     dx = x[1, 2] - x[1, 1]  # 1マス間の距離を計算(x)
+
     dy = y[2, 1] - y[1, 1]  # 1マス間の距離を計算(y)
     dt = t[2] - t[1]  # 1ステップあたりの時間間隔を計算
 
     F = (((x - 0.3) ** 2 + (y - 0.3) ** 2) <= 0.1 ** 2)  # 初期条件は(0.3, 0.3)を中心とした半径0.1の円の内部が1になるように指定
+
     rows = [i for i in range(mesh_size)]
     cols = [i for i in range(mesh_size)]
     [cols, rows] = np.meshgrid(cols, rows)
+
 
     # 関数定義
     def mystencil(row, col):  # 上下左右のインデックスを計算
