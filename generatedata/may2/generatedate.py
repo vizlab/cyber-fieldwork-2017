@@ -7,7 +7,6 @@ w = h = 50.
 dx = dy = 1
 # Thermal diffusivity of steel, mm2.s-1
 D = 4.
-
 Tcool, Thot = 300, 700
 
 nx, ny = int(w/dx), int(h/dy)
@@ -17,6 +16,10 @@ dt = dx2 * dy2 / (2 * D * (dx2 + dy2))
 
 u0 = Tcool * np.ones((nx, ny))
 u = np.empty((nx, ny))
+# v= np.ones((vx,vy))*1
+vx = np.ones((50, 50))* 0.5
+vy = np.ones((50, 50))* 0
+
 
 # Initial conditions - ring of inner radius r, width dr centred at (cx,cy) (mm)
 r, cx, cy = 10, 25, 25
@@ -27,11 +30,11 @@ for i in range(nx):
         if p2 < r2:
           u0[i,j] = Thot
 
-def do_timestep(u0, u):
+def do_timestep(u0, u, vx,vy):
     # Propagate with forward-difference in time, central-difference in space
-    u[1:-1, 1:-1] = u0[1:-1, 1:-1] + D * dt * (
-          (u0[2:, 1:-1] - 2*u0[1:-1, 1:-1] + u0[:-2, 1:-1])/dx2
-          + (u0[1:-1, 2:] - 2*u0[1:-1, 1:-1] + u0[1:-1, :-2])/dy2 )
+    u[1:-1, 1:-1] = u0[1:-1, 1:-1] + D * dt * ((u0[2:, 1:-1] - 2*u0[1:-1, 1:-1] + u0[:-2, 1:-1])/dx2 + (u0[1:-1, 2:] - 2*u0[1:-1, 1:-1] + u0[1:-1, :-2])/dy2 )\
+                -(dt * vx[1:-1, 1:-1] * (u0[1:-1, 1:-1] - u0[2:, 1:-1]) / dx)\
+                -(dt * vy[1:-1, 1:-1] * ((u0[1:-1, 1:-1] - u0[1:-1, 2:])/ dy))
 
     u0 = u.copy()
     return u0, u
@@ -43,7 +46,7 @@ mfig = [0, 30, 50, 100]
 fignum = 0
 fig = plt.figure()
 for m in range(nsteps):
-    u0, u = do_timestep(u0, u)
+    u0, u = do_timestep(u0, u, vx,vy)
     if m in mfig:
         fignum += 1
         print(m, fignum)

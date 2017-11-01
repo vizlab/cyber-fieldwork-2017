@@ -23,26 +23,27 @@ def mystencil(row, col):
     down = row - 1
     left = col - 1
     right = col + 1
-
-    Dx = D * (F(row, left) - 2 * F(row, col) + F(row, right)) / (dx ** 2)
-    Dy = D * (F(down, col) - 2 * F(row, col) + F(up, col)) / (dy **2)
+    Dx = D* (F[2:, 1:-1] - 2*F[1:-1, 1:-1] + F[:-2, 1:-1])/(dx**2)
+       #   + (F[1:-1, 2:] - 2*F[1:-1, 1:-1] + F[1:-1, :-2])/dy**2 )
+   # Dx = D * (F(row, left) - 2 * F(row, col) + F(row, right)) / (dx ** 2)
+    Dy = D * (F[1:-1, 2:] - 2*F[1:-1, 1:-1] + F[1:-1, :-2]) /(dy **2)
     if (u >= 0):
-        fu = u * (F(row, col) - F(row, left)) / dx
+        fu = u * (F[1:-1, 1:-1] - F[2:, 1:-1]) / dx
     else:
-        fu = u * (F(row, right) - F(row, col)) / dx
+        fu = u * (F[:-2, 1:-1] - F[1:-1, 1:-1]) / dx
 
     if (v >= 0):
-        fv = v * (F(row, col) - F(down, col)) / dy
+        fv = v * (F[1:-1, 1:-1] - F[1:-1, 2:])/ dy
     else:
-        fv = v * (F(up, col) - F(row, col)) / dy
+        fv = v * (F[1:-1, :-2] - F[1:-1, 1:-1]) / dy
 
-    fn = F(row, col) + (Dx + Dy - (fu + fv)) * dt
+    fn = F[1:-1, 1:-1] + (Dx + Dy - (fu + fv)) * dt
     return row,col
 
 def boundary(row, col):
-    if (row == 1):
+    if (len(row) == 1):
             fn = mystencil(49, col)
-    elif (row == 50):
+    elif (len(row） == 50):
             fn = mystencil(2,col)
     else:
         if (col == 1):
