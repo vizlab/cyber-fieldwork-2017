@@ -46,7 +46,7 @@ def adv_dif_2d(Usegpu, mesh_size, t):
             fv = v * (F(up, col) - F(row, col)) / dy
 
         fn = F(row, col) + (Dx + Dy - (fu + fv)) * dt
-        return fn
+        return row,col
 
     def GetFt(rows, cols):
         Rows = np.array(rows)
@@ -54,7 +54,7 @@ def adv_dif_2d(Usegpu, mesh_size, t):
         Rows.reshape(mesh_size ** 2)
         Cols.reshape(mesh_size ** 2)
         ft = []
-        for row, col in zip(Rows, Cols):
+        for row, col in zip (Rows, Cols):
             ft.append(mystencil(row, col))
 
         ft = np.array(ft)
@@ -72,7 +72,7 @@ def adv_dif_2d(Usegpu, mesh_size, t):
                 fn = Ft[row][2]
             else:
                 fn = Ft[row][col]
-        return fn
+        return row,col
 
     def GetFn(rows, cols):
         Rows = np.array(rows)
@@ -97,7 +97,7 @@ def adv_dif_2d(Usegpu, mesh_size, t):
         Fn = GetFn(rows, cols)
         X[m][:][0] = Fn
         m += 1
-        F = Fn[:][:]
+        F = Fn
 
 
 X = adv_dif_2d(0, 50, [i / 10 for i in range(51)])
