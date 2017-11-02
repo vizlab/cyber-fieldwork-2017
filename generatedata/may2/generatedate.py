@@ -17,7 +17,7 @@ dt = dx2 * dy2 / (2 * D * (dx2 + dy2))
 u0 = Tcool * np.ones((nx, ny))
 u = np.empty((nx, ny))
 # v= np.ones((vx,vy))*1
-vx = np.ones((100, 100))* 20
+vx = np.ones((100, 100))* 30
 vy = np.ones((100, 100))* 0
 
 
@@ -40,9 +40,9 @@ def do_timestep(u0, u, vx,vy):
     return u0, u
 
 # Number of timesteps
-nsteps = 101
+nsteps = 121
 # Output 4 figures at these timesteps
-mfig = [0, 20,40,60,80, 100]
+mfig = [0, 20,40,60,80,90, 100,110,120]
 fignum = 0
 fig = plt.figure()
 for m in range(nsteps):
@@ -50,7 +50,7 @@ for m in range(nsteps):
     if m in mfig:
         fignum += 1
         print(m, fignum)
-        ax = fig.add_subplot(230 + fignum)
+        ax = fig.add_subplot(330 + fignum)
         im = ax.imshow(u.copy(), cmap=plt.get_cmap('hot'), vmin=Tcool,vmax=Thot)
         ax.set_axis_off()
         ax.set_title('{:.1f} ms'.format(m*dt*1000))
