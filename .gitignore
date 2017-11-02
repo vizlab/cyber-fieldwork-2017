@@ -3,3 +3,4 @@ node_modules
 front/public/bundle.js
 *.Rproj
 .Rproj.user
+*.Rhistory
