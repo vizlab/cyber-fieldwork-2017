@@ -11,6 +11,7 @@ gradient_fields = []
 x_grad_max_list = []
 y_grad_max_list = []
 
+# calculate gradient fields
 for scalar_field in scalar_fields:
     x_grad = np.gradient(scalar_field, axis=1)
     y_grad = np.gradient(scalar_field, axis=0)
