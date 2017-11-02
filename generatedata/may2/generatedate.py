@@ -2,11 +2,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # plate size, mm
-w = h = 50.
+w = h = 10.
 # intervals in x-, y- directions, mm
-dx = dy = 1
+dx = dy = 0.1
 # Thermal diffusivity of steel, mm2.s-1
-D = 4.
+D = -4
 Tcool, Thot = 300, 700
 
 nx, ny = int(w/dx), int(h/dy)
@@ -17,12 +17,12 @@ dt = dx2 * dy2 / (2 * D * (dx2 + dy2))
 u0 = Tcool * np.ones((nx, ny))
 u = np.empty((nx, ny))
 # v= np.ones((vx,vy))*1
-vx = np.ones((50, 50))* 0.5
-vy = np.ones((50, 50))* 0
+vx = np.ones((100, 100))* 20
+vy = np.ones((100, 100))* 0
 
 
 # Initial conditions - ring of inner radius r, width dr centred at (cx,cy) (mm)
-r, cx, cy = 10, 25, 25
+r, cx, cy = 2, 5, 5
 r2 = r**2
 for i in range(nx):
     for j in range(ny):
@@ -34,7 +34,7 @@ def do_timestep(u0, u, vx,vy):
     # Propagate with forward-difference in time, central-difference in space
     u[1:-1, 1:-1] = u0[1:-1, 1:-1] + D * dt * ((u0[2:, 1:-1] - 2*u0[1:-1, 1:-1] + u0[:-2, 1:-1])/dx2 + (u0[1:-1, 2:] - 2*u0[1:-1, 1:-1] + u0[1:-1, :-2])/dy2 )\
                 -(dt * vx[1:-1, 1:-1] * (u0[1:-1, 1:-1] - u0[2:, 1:-1]) / dx)\
-                -(dt * vy[1:-1, 1:-1] * ((u0[1:-1, 1:-1] - u0[1:-1, 2:])/ dy))
+                -(dt * vy[1:-1, 1:-1] * ((u0[1:-1, 1:-1] - u0[2:, 1:-1])/ dy))
 
     u0 = u.copy()
     return u0, u
@@ -42,15 +42,15 @@ def do_timestep(u0, u, vx,vy):
 # Number of timesteps
 nsteps = 101
 # Output 4 figures at these timesteps
-mfig = [0, 30, 50, 100]
+mfig = [0, 20,40,60,80, 100]
 fignum = 0
 fig = plt.figure()
 for m in range(nsteps):
-    u0, u = do_timestep(u0, u, vx,vy)
+    u0, u = do_timestep(u0, u, vx, vy)
     if m in mfig:
         fignum += 1
         print(m, fignum)
-        ax = fig.add_subplot(220 + fignum)
+        ax = fig.add_subplot(230 + fignum)
         im = ax.imshow(u.copy(), cmap=plt.get_cmap('hot'), vmin=Tcool,vmax=Thot)
         ax.set_axis_off()
         ax.set_title('{:.1f} ms'.format(m*dt*1000))
