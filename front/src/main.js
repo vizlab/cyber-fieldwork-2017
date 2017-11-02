@@ -101,18 +101,17 @@ function drawVector(scalarField, gradientField, xGradMax, yGradMax) {
         const y = i * 5;
         for (let j = 0; j < 100; j += arrowInterval) {
             const x = j * 5;
-            if (i % 5 === 0 && j % 5 ===0) {
-                const xGrad = gradientField.x[i][j];
-                const yGrad = - gradientField.y[i][j];
-                const theta = - Math.atan2(yGrad, xGrad);
-                const r = 200 * Math.sqrt(Math.pow(xGrad / xGradMax,2) + Math.pow(yGrad / yGradMax,2));
-                if (r < 1) {
-                    continue;
-                }
-                const p0 = {x: x, y: y};
-                const p1 = {x: x - r * Math.cos(theta), y: y - r * Math.sin(theta) };
-                drawLineWithArrowhead(p0, p1, 3, ctx);
+
+            const xGrad = gradientField.x[i][j];
+            const yGrad = - gradientField.y[i][j];
+            const theta = - Math.atan2(yGrad, xGrad);
+            const r = 200 * Math.sqrt(Math.pow(xGrad / xGradMax,2) + Math.pow(yGrad / yGradMax,2));
+            if (r < 1) {
+                continue;
             }
+            const p0 = {x: x, y: y};
+            const p1 = {x: x - r * Math.cos(theta), y: y - r * Math.sin(theta) };
+            drawLineWithArrowhead(p0, p1, 3, ctx);
         }
     }
     ctx.stroke();
