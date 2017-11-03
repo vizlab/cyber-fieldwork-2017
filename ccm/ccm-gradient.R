@@ -17,7 +17,7 @@ for (t in 1:N_TIMESTEP) {
   x_grad <- gradient_fields[t,]$x[[1]]
   y_grad <- gradient_fields[t,]$y[[1]]
   dx_time_series <- c(dx_time_series, x_grad[a_x, a_y])
-  dy_time_series <- c(dy_time_series, y_grad[b_x, b_y])
+  dy_time_series <- c(dy_time_series, y_grad[a_x, a_y])
 }
 plot(dx_time_series)
 plot(dy_time_series)
