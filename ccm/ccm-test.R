@@ -2,42 +2,6 @@ library(rEDM)
 library(jsonlite)
 library(multispatialCCM)
 
-showdata <- function(Accm, Bccm) {
-  plot(Accm, type="l", col=1, lwd=2, xlim=c(0, 212), ylim=c(0,1), xlab="time step", ylab="Normalized Value", cex.lab = 1.5)
-  lines(Bccm, type="l", col=2, lty=2, lwd=2, cex.lab = 1.5)
-  legend("topleft", c("Salinity", "Temprature"), cex=1.5, lty=c(1,2), col=c(1,2), lwd=2, bty="n")
-}
-
-determineEmbeddingDimension <- function(data) {
-  lib <- c(1, 50)
-  pred <- c(90, 212)  
-  simplex_output <- simplex(data, lib, pred)
-  plot(simplex_output$E, simplex_output$rho, type = "l", xlab = "Embedding Dimension (E)", ylab = "Forecast Skill (rho)")
-}
-
-predictionDeacy <- function(data, Em) {
-  lib <- c(1, 50)
-  pred <- c(90, 212)  
-  simplex_output <- simplex(data, lib, pred, E = Em, tp = 1:10)
-  par(mar = c(4, 4, 1, 1))
-  plot(simplex_output$tp, simplex_output$rho, type = "l", xlab = "Time to Prediction (tp)", ylab = "Forecast Skill (rho)")
-}
-
-identifyingNonlinearity <- function(data, Em) {
-  lib <- c(1, 50)
-  pred <- c(90, 212)  
-  smap_output <- s_map(data, lib, pred, E=E_A)
-  par(mar = c(4, 4, 1, 1), mgp = c(2.5, 1, 0))
-  plot(smap_output$theta, smap_output$rho, type = "l", xlab = "Nonlinearity (theta)", ylab = "Forecast Skill (rho)")
-}
-
-drawCCM <- function(CCM_boot_A, CCM_boot_B) {
-  plotxlimits<-range(c(CCM_boot_A$Lobs, CCM_boot_B$Lobs))
-  plot(CCM_boot_A$Lobs, CCM_boot_A$rho, type="l", col=1, lwd=2, xlim=c(plotxlimits[1], plotxlimits[2]), ylim=c(0,1), xlab="Library Size", ylab="Cross Map Skill (rho)", cex.lab = 1.5)
-  lines(CCM_boot_B$Lobs, CCM_boot_B$rho, type="l", col=2, lty=2, lwd=2)
-  legend("topleft", c("Salinity causes Temprature", "Temprature causes Salinituy"), lty=c(1,2), col=c(1,2), lwd=2, bty="n", cex=1.2)
-}
-
 scalar_fields <- fromJSON("../front/public/data.json")
 N_TIMESTEP <- dim(scalar_fields)[1]
 
@@ -45,63 +9,71 @@ a_x <- 50
 a_y <- 50
 b_x <- 30
 b_y <- 30
+a_max <- max(scalar_fields[, a_x, a_y])
+b_max <- max(scalar_fields[, b_x, b_y])
+axis_max <- ifelse(a_max > b_max, a_max, b_max)
+
 a_time_series <- c()
 b_time_series <- c()
 for (t in 1:N_TIMESTEP) {
-  a_time_series <- c(a_time_series, scalar_fields[t, a_y, a_x])
-  b_time_series <- c(b_time_series, scalar_fields[t, b_y, b_x])
+  a_time_series <- c(a_time_series, scalar_fields[t, a_x, a_y])
+  b_time_series <- c(b_time_series, scalar_fields[t, b_x, b_y])
 }
-plot(a_time_series)
-plot(b_time_series)
+
 
 # show data
-showdata(Accm, Bccm)
+plot(a_time_series, type="l", col=1, lwd=2, xlim=c(0, N_TIMESTEP), ylim=c(0, axis_max), xlab="time step", ylab="Normalized Value", cex.lab = 1.5)
+lines(b_time_series, type="l", col=2, lty=2, lwd=2, cex.lab = 1.5)
+legend("bottomright", c("a", "b"), cex=1.5, lty=c(1,2), col=c(1,2), lwd=2, bty="n")
+
+
 # determine Embedding Dimension
-determineEmbeddingDimension(a_time_series)
-E_A = 2
-determineEmbeddingDimension(Bccm)
-E_B = 2
+lib <- c(1, 20)
+pred <- c(21, 50)  
+simplex_output <- simplex(a_time_series, lib, pred)
+plot(simplex_output$E, simplex_output$rho, type = "l", xlab = "Embedding Dimension (E)", ylab = "Forecast Skill (rho)")
+E_a = 2
+
+
+lib <- c(1, 20)
+pred <- c(21, 50)  
+simplex_output <- simplex(b_time_series, lib, pred)
+plot(simplex_output$E, simplex_output$rho, type = "l", xlab = "Embedding Dimension (E)", ylab = "Forecast Skill (rho)")
+E_b = 2
+
+# create trajectory vector for attractor
+E <- 2
+TAU <- 1
+X_DIM <- E
+BACK_MAX <- (X_DIM - 1) * TAU
+X_N <- length(a_time_series) - BACK_MAX # length of x
+x <- array(0, dim=c(X_N, X_DIM))
+for (t in 1 : X_N) {
+  for(j in 1:X_DIM) {
+    x[t,j] <- a_time_series[(t + BACK_MAX) - (j - 1) * TAU]
+  }
+}
+plot(x, xlim=c(0, 700), ylim=c(0,700), xlab = "x(t)", ylab = "x(t-1)")
+
 # Prediction Decay
-predictionDeacy(data = Accm, Em = E_A)
-predictionDeacy(data = Bccm, Em = E_B)
+simplex_output <- simplex(a_time_series, lib, pred, E = E_a, tp = 1:10)
+par(mar = c(4, 4, 1, 1))
+plot(simplex_output$tp, simplex_output$rho, type = "l", xlab = "Time to Prediction (tp)", ylab = "Forecast Skill (rho)")
+
+simplex_output <- simplex(b_time_series, lib, pred, E = E_b, tp = 1:10)
+par(mar = c(4, 4, 1, 1))
+plot(simplex_output$tp, simplex_output$rho, type = "l", xlab = "Time to Prediction (tp)", ylab = "Forecast Skill (rho)")
 TAU = 1
+
 # Identifying Nonlinearity
-identifyingNonlinearity(data = Accm, Em = E_A)
-identifyingNonlinearity(data = Bccm, Em = E_B)
-# CCM(use multispatialCCM)
-signal_A_out<-SSR_check_signal(A=Accm, E=E_A, tau=TAU, predsteplist=1:10)
-signal_B_out<-SSR_check_signal(A=Bccm, E=E_B, tau=TAU, predsteplist=1:10)
-CCM_boot_A<-CCM_boot(Accm, Bccm, E_A, tau=TAU, iterations=30)
-CCM_boot_B<-CCM_boot(Bccm, Accm, E_B, tau=TAU, iterations=30)
-(CCM_significance_test<-ccmtest(CCM_boot_A, CCM_boot_B))
-drawCCM(CCM_boot_A = CCM_boot_A, CCM_boot_B = CCM_boot_B)
+smap_output <- s_map(a_time_series, lib, pred, E = E_a)
+par(mar = c(4, 4, 1, 1), mgp = c(2.5, 1, 0))
+plot(smap_output$theta, smap_output$rho, type = "l", xlab = "Nonlinearity (theta)", ylab = "Forecast Skill (rho)")
 
-# ---------------------------------------------------------------
-index <- 500
-Accm <- as.numeric(unlist(data$data[index,]$s))
-Bccm <- as.numeric(unlist(data$data[index,]$t))
+smap_output <- s_map(b_time_series, lib, pred, E = E_b)
+par(mar = c(4, 4, 1, 1), mgp = c(2.5, 1, 0))
+plot(smap_output$theta, smap_output$rho, type = "l", xlab = "Nonlinearity (theta)", ylab = "Forecast Skill (rho)")
 
-# show data
-showdata(Accm, Bccm)
+# CCM
 
-# determine Embedding Dimension
-determineEmbeddingDimension(Accm)
-E_A = 1
-determineEmbeddingDimension(Bccm)
-E_B = 1
 
-# Prediction Decay
-predictionDeacy(data = Accm, Em = E_A)
-predictionDeacy(data = Bccm, Em = E_B)
-TAU = 2
-# Identifying Nonlinearity
-identifyingNonlinearity(data = Accm, Em = E_A)
-identifyingNonlinearity(data = Bccm, Em = E_B)
-
-# CCM(use multispatialCCM)
-signal_A_out<-SSR_check_signal(A=Accm, E=E_A, tau=TAU, predsteplist=1:10)
-signal_B_out<-SSR_check_signal(A=Bccm, E=E_B, tau=TAU, predsteplist=1:10)
-CCM_boot_A<-CCM_boot(Accm, Bccm, E_A, tau=TAU, iterations=30)
-CCM_boot_B<-CCM_boot(Bccm, Accm, E_B, tau=TAU, iterations=30)
-(CCM_significance_test<-ccmtest(CCM_boot_A, CCM_boot_B))
-drawCCM(CCM_boot_A = CCM_boot_A, CCM_boot_B = CCM_boot_B)
