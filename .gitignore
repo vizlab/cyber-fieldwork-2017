@@ -4,3 +4,4 @@ front/public/bundle.js
 *.Rproj
 .Rproj.user
 *.Rhistory
+ccm/*.json
