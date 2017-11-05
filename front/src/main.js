@@ -87,32 +87,28 @@ function drawVector(scalarField, gradientField, xGradMax, yGradMax) {
     const ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.beginPath();
-    for (let i = 0; i < 100; i++) {
-        const y = i * 5;
-        for (let j = 0; j < 100; j++) {
-            const x = j * 5;
-            ctx.fillStyle = colors[parseInt(scalarField[i][j])];
-            ctx.fillRect(x, y, 5, 5);
+
+    const SCALE = 5;
+    for (let x = 0; x < 100; x++) {
+        for (let y = 0; y < 100; y++) {;
+            ctx.fillStyle = colors[parseInt(scalarField[x][y])];
+            ctx.fillRect(x * SCALE, y * SCALE, SCALE, SCALE);
         }
     }
 
     const arrowInterval = 5;
-    for (let i = 0; i < 100; i += arrowInterval) {
-        const y = i * 5;
-        for (let j = 0; j < 100; j += arrowInterval) {
-            const x = j * 5;
-            if (i % 5 === 0 && j % 5 ===0) {
-                const xGrad = gradientField.x[i][j];
-                const yGrad = - gradientField.y[i][j];
-                const theta = - Math.atan2(yGrad, xGrad);
-                const r = 200 * Math.sqrt(Math.pow(xGrad / xGradMax,2) + Math.pow(yGrad / yGradMax,2));
-                if (r < 1) {
-                    continue;
-                }
-                const p0 = {x: x, y: y};
-                const p1 = {x: x - r * Math.cos(theta), y: y - r * Math.sin(theta) };
-                drawLineWithArrowhead(p0, p1, 3, ctx);
+    for (let x = 0; x < 100; x += arrowInterval) {
+        for (let y = 0; y < 100; y += arrowInterval) {
+            const xGrad = gradientField.x[x][y];
+            const yGrad = - gradientField.y[x][y];
+            const theta = - Math.atan2(yGrad, xGrad);
+            const r = 50 * Math.sqrt(Math.pow(xGrad / xGradMax,2) + Math.pow(yGrad / yGradMax,2));
+            if (r < 1) {
+                continue;
             }
+            const p0 = {x: x * SCALE, y: y * SCALE};
+            const p1 = {x: (x - r * Math.cos(theta)) * SCALE, y: (y - r * Math.sin(theta)) * SCALE };
+            drawLineWithArrowhead(p0, p1, 3, ctx);
         }
     }
     ctx.stroke();
