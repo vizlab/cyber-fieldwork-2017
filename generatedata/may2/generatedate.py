@@ -15,11 +15,10 @@ dx2, dy2 = dx*dx, dy*dy
 dt = dx2 * dy2 / (2 * D * (dx2 + dy2))
 
 u0 = Tcool * np.ones((nx, ny))
-u = np.empty((nx, ny))
+u = np.ones((nx, ny))*Tcool
 # v= np.ones((vx,vy))*1
 vx = np.ones((50, 50))* 0.5
-vy = np.ones((50, 50))* 0
-
+vy = np.ones((50, 50))*0
 
 # Initial conditions - ring of inner radius r, width dr centred at (cx,cy) (mm)
 r, cx, cy = 10, 25, 25
@@ -33,9 +32,8 @@ for i in range(nx):
 def do_timestep(u0, u, vx,vy):
     # Propagate with forward-difference in time, central-difference in space
     u[1:-1, 1:-1] = u0[1:-1, 1:-1] + D * dt * ((u0[2:, 1:-1] - 2*u0[1:-1, 1:-1] + u0[:-2, 1:-1])/dx2 + (u0[1:-1, 2:] - 2*u0[1:-1, 1:-1] + u0[1:-1, :-2])/dy2 )\
-                -(dt * vx[1:-1, 1:-1] * (u0[1:-1, 1:-1] - u0[2:, 1:-1]) / dx)\
-                -(dt * vy[1:-1, 1:-1] * ((u0[1:-1, 1:-1] - u0[1:-1, 2:])/ dy))
-
+                -(dt * vx[1:-1, 1:-1] * ((u0[1:-1, 1:-1] - u0[2:, 1:-1])/dx))\
+                -(dt * vy[1:-1, 1:-1] * ((u0[1:-1, 1:-1] - u0[:-2, 1:-1])/dy))
     u0 = u.copy()
     return u0, u
 
