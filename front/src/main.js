@@ -56,7 +56,7 @@ $('#ex6').slider({
 
 Plotly.newPlot('plotlyDiv', [], layout);
 
-const scalarFetch = fetch('data.json').then(response => response.json());
+const scalarFetch = fetch('convection-diffusion.json').then(response => response.json());
 const gradientFetch = fetch('gradient-fields.json').then(response => response.json());
 
 Promise.all([scalarFetch, gradientFetch]).then((jsonList) => {
