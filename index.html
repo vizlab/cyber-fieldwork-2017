@@ -1,16 +1,36 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ja">
 <head>
     <meta charset="UTF-8">
     <title>Cyber Fieldwork 2017</title>
     <script src="plotlyjsdist/plotly.min.js"></script>
+    <style type="text/css">
+        #slider input {
+            width: 150px;
+            height: 20px;
+            margin: 0;
+            transform-origin: 75px 75px;
+            transform: rotate(-90deg);
+        }
+        #slider-value {
+            margin:130px 6px;
+        }
+    </style>
 </head>
 <body>
     <div style="display: flex">
-        <canvas id="app" width="500" height="500"></canvas>
-        <div id="plotlyDiv" width="500" height="500"></div>
-        <div id="slider" height="500" width="500">
-            <input id="ex6" type="text" data-slider-min="0" data-slider-max="500" data-slider-step="5" data-slider-value="3"/>
+        <div>
+            <h4>方程式の可視化(2D) & 勾配の可視化</h4>
+            <canvas id="app" width="500" height="500"></canvas>
+        </div>
+        <div>
+            <h4>方程式の可視化(3D)</h4>
+            <div id="plotlyDiv" width="500" height="500"></div>
+        </div>
+
+        <div id="slider" height="500" width="500" display="inline-block">
+            <input type="range" id="slider-icon" min="0" max="50" step="1" value="0">
+            <div id="slider-value">0</div>
         </div>
     </div>
     <script src="bundle.js"></script>

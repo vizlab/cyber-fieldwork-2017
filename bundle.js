@@ -10390,12 +10390,6 @@ var layout = {
     }
 };
 
-(0, _jquery2.default)('#ex6').slider({
-    formatter: function formatter(value) {
-        return 'Current value: ' + value;
-    }
-});
-
 Plotly.newPlot('plotlyDiv', [], layout);
 
 var scalarFetch = fetch('data.json').then(function (response) {
@@ -10403,6 +10397,25 @@ var scalarFetch = fetch('data.json').then(function (response) {
 });
 var gradientFetch = fetch('gradient-fields.json').then(function (response) {
     return response.json();
+});
+var intervalId = 0;
+
+(0, _jquery2.default)("#slider-icon").on("input", function () {
+    // console.log($("#slider-icon").val());
+    var index = (0, _jquery2.default)("#slider-icon").val();
+    (0, _jquery2.default)("#slider-value").text(index);
+    clearInterval(intervalId);
+
+    console.log(scalarFetch);
+    Promise.all([scalarFetch, gradientFetch]).then(function (jsonList) {
+        var scalarFields = jsonList[0];
+        var gradientFields = jsonList[1].data;
+        var xGradMax = jsonList[1].x_grad_max;
+        var yGradMax = jsonList[1].y_grad_max;
+
+        drawVector(scalarFields[index], gradientFields[index], xGradMax, yGradMax);
+        draw3D(scalarFields[index]);
+    });
 });
 
 Promise.all([scalarFetch, gradientFetch]).then(function (jsonList) {
@@ -10412,13 +10425,14 @@ Promise.all([scalarFetch, gradientFetch]).then(function (jsonList) {
     var yGradMax = jsonList[1].y_grad_max;
 
     var playIndex = 0;
-    setInterval(function () {
+    intervalId = setInterval(function () {
         if (playIndex === scalarFields.length) {
             playIndex = 0;
         }
         drawVector(scalarFields[playIndex], gradientFields[playIndex], xGradMax, yGradMax);
         draw3D(scalarFields[playIndex]);
         playIndex++;
+        console.log(playIndex);
     }, 500);
 });
 
@@ -10433,32 +10447,29 @@ function drawVector(scalarField, gradientField, xGradMax, yGradMax) {
     var ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.beginPath();
-    for (var i = 0; i < 100; i++) {
-        var y = i * 5;
-        for (var j = 0; j < 100; j++) {
-            var x = j * 5;
-            ctx.fillStyle = colors[parseInt(scalarField[i][j])];
-            ctx.fillRect(x, y, 5, 5);
+
+    var SCALE = 5;
+    for (var x = 0; x < 100; x++) {
+        for (var y = 0; y < 100; y++) {
+            ;
+            ctx.fillStyle = colors[parseInt(scalarField[x][y])];
+            ctx.fillRect(x * SCALE, y * SCALE, SCALE, SCALE);
         }
     }
 
     var arrowInterval = 5;
-    for (var _i = 0; _i < 100; _i += arrowInterval) {
-        var _y = _i * 5;
-        for (var _j = 0; _j < 100; _j += arrowInterval) {
-            var _x = _j * 5;
-            if (_i % 5 === 0 && _j % 5 === 0) {
-                var xGrad = gradientField.x[_i][_j];
-                var yGrad = -gradientField.y[_i][_j];
-                var theta = -Math.atan2(yGrad, xGrad);
-                var r = 200 * Math.sqrt(Math.pow(xGrad / xGradMax, 2) + Math.pow(yGrad / yGradMax, 2));
-                if (r < 1) {
-                    continue;
-                }
-                var p0 = { x: _x, y: _y };
-                var p1 = { x: _x - r * Math.cos(theta), y: _y - r * Math.sin(theta) };
-                drawLineWithArrowhead(p0, p1, 3, ctx);
+    for (var _x = 0; _x < 100; _x += arrowInterval) {
+        for (var _y = 0; _y < 100; _y += arrowInterval) {
+            var xGrad = gradientField.x[_x][_y];
+            var yGrad = -gradientField.y[_x][_y];
+            var theta = -Math.atan2(yGrad, xGrad);
+            var r = 50 * Math.sqrt(Math.pow(xGrad / xGradMax, 2) + Math.pow(yGrad / yGradMax, 2));
+            if (r < 1) {
+                continue;
             }
+            var p0 = { x: _x * SCALE, y: _y * SCALE };
+            var p1 = { x: (_x - r * Math.cos(theta)) * SCALE, y: (_y - r * Math.sin(theta)) * SCALE };
+            drawLineWithArrowhead(p0, p1, 3, ctx);
         }
     }
     ctx.stroke();
