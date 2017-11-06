@@ -10,11 +10,19 @@ filePath = '../front/public/data.json'
 with open(filePath, 'r') as readfile:
     data_json = json.load(readfile)
 scalar_fields = np.array(data_json, np.float32)
+#配列サイズ 51*100*100
 
+#初期値引いてみるテスト
+# scalar_fields = scalar_fields - scalar_fields[0,:,:]
+# print(scalar_fields[0,:,:])
+# print(scalar_fields[50,:,:])
+
+#データ間の距離
 dt = 0.0006250000000000001*10 #sec
 dx = 0.1 #m
 dy = 0.1 #m
-#配列サイズ 51*100*100
+
+#データの勾配
 f_t = np.gradient(scalar_fields, axis=0)/dt
 f_x = np.gradient(scalar_fields, axis=1)/dx
 f_y = np.gradient(scalar_fields, axis=2)/dy
@@ -60,22 +68,52 @@ f_yy = np.gradient(f_y, axis=2)/dy
 # partial = np.c_[f_xx_col, f_yy_col, f, f_x_col, f_y_col]
 
 #回帰分析変数を最低限に
-f_t_col = f_t.flatten()
-f_xx_col = f_xx.flatten()
-f_yy_col = f_yy.flatten()
-partial = np.c_[f_xx_col, f_yy_col]
-
-###一部の範囲で回帰分析してみるとD=4でちゃんと結果がでる
-# f_t_col = f_t[:,40:60,40:60].flatten()
-# f_xx_col = f_xx[:,40:60,40:60].flatten()
-# f_yy_col = f_yy[:,40:60,40:60].flatten()
+# f_t_col = f_t.flatten()
+# f_xx_col = f_xx.flatten()
+# f_yy_col = f_yy.flatten()
 # partial = np.c_[f_xx_col, f_yy_col]
 
+###初期値の同じ一部の範囲で回帰分析してみるとD=4でちゃんと結果がでる
+f = scalar_fields[:,40:60,40:60].flatten()
+f_t_col = f_t[:,40:60,40:60].flatten()
+f_x_col = f_x[:,40:60,40:60].flatten()
+f_y_col = f_y[:,40:60,40:60].flatten()
+f_xx_col = f_xx[:,40:60,40:60].flatten()
+f_yy_col = f_yy[:,40:60,40:60].flatten()
+partial = np.c_[f_xx_col, f_yy_col, f, f_x_col, f_y_col]
+
+#初期値0グループで実験
+# f = scalar_fields[:,:,0:30].flatten()
+# f = np.append(f,scalar_fields[:,0:30,31:70].flatten())
+# f = np.append(f,scalar_fields[:,70:100,31:70].flatten())
+# f = np.append(f,scalar_fields[:,:,71:100].flatten())
+# f_t_col = f_t[:,:,0:30].flatten()
+# f_t_col = np.append(f_t_col,f_t[:,0:30,31:70].flatten())
+# f_t_col = np.append(f_t_col,f_t[:,70:100,31:70].flatten())
+# f_t_col = np.append(f_t_col,f_t[:,:,71:100].flatten())
+# f_x_col = f_x[:,:,0:30].flatten()
+# f_x_col = np.append(f_x_col,f_t[:,0:30,31:70].flatten())
+# f_x_col = np.append(f_x_col,f_t[:,70:100,31:70].flatten())
+# f_x_col = np.append(f_x_col,f_t[:,:,71:100].flatten())
+# f_y_col = f_y[:,:,0:30].flatten()
+# f_y_col = np.append(f_y_col,f_t[:,0:30,31:70].flatten())
+# f_y_col = np.append(f_y_col,f_t[:,70:100,31:70].flatten())
+# f_y_col = np.append(f_y_col,f_t[:,:,71:100].flatten())
+# f_xx_col = f_xx[:,:,0:30].flatten()
+# f_xx_col = np.append(f_xx_col,f_t[:,0:30,31:70].flatten())
+# f_xx_col = np.append(f_xx_col,f_t[:,70:100,31:70].flatten())
+# f_xx_col = np.append(f_xx_col,f_t[:,:,71:100].flatten())
+# f_yy_col = f_yy[:,:,0:30].flatten()
+# f_yy_col = np.append(f_yy_col,f_t[:,0:30,31:70].flatten())
+# f_yy_col = np.append(f_yy_col,f_t[:,70:100,31:70].flatten())
+# f_yy_col = np.append(f_yy_col,f_t[:,:,71:100].flatten())
+# partial = np.c_[f_xx_col, f_yy_col, f, f_x_col, f_y_col]
+
 #配列サイズ確認
-#print('f',f.shape)
+print('f',f.shape)
 print('f_t_col',f_t_col.shape)
-#print('f_x_col',f_x_col.shape)
-#print('f_y_col',f_y_col.shape)
+print('f_x_col',f_x_col.shape)
+print('f_y_col',f_y_col.shape)
 print('f_xx_col',f_xx_col.shape)
 print('f_yy_col',f_yy_col.shape)
 print('partial',partial.shape)
@@ -84,7 +122,7 @@ print('partial',partial.shape)
 reg.fit(partial,f_t_col)
 
 #回帰係数
-print(pd.DataFrame({"Name":['f_xx', 'f_yy'],#, 'f', 'f_x', 'f_y'],
+print(pd.DataFrame({"Name":['f_xx', 'f_yy', 'f', 'f_x', 'f_y'],
                     "Coefficients":reg.coef_}).sort_values(by='Coefficients'))
 print(reg.intercept_)
 print(reg.score(partial, f_t_col))
@@ -92,6 +130,10 @@ print(reg.score(partial, f_t_col))
 ###  D=4.になるはず
 ###Q.なぜ結果が少しずれるのか？
 ###     データが少ない？
-###     座標が2次元のせいで初期値が2次元で存在してるのがうまくいかない理由？
-###     初期値700の範囲に対してのみ回帰分析を行なった結果D=4が求められた
-###     それなら係数自体はどの座標点でとっても一定になるはず？
+###     座標が2次元のせいで初期値が複数存在してるのがうまくいかない理由？
+###         初期値700の範囲に対してのみ回帰分析を行なった結果D=4が求められた
+###     全データからそれぞれの場所での初期値を引き算してみる？
+###         ダメだった
+###     切片がおかしい
+###     変化のないデータがノイズになっている可能性
+###     二次方程式でもデータ同士を掛けたものを回帰分析すればちゃんと出そう
