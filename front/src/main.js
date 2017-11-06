@@ -48,16 +48,30 @@ const layout = {
     }
 };
 
-$('#ex6').slider({
-    formatter: function(value) {
-        return 'Current value: ' + value;
-    }
-});
 
 Plotly.newPlot('plotlyDiv', [], layout);
 
 const scalarFetch = fetch('data.json').then(response => response.json());
 const gradientFetch = fetch('gradient-fields.json').then(response => response.json());
+let intervalId = 0;
+
+$("#slider-icon").on("input", function() {
+    // console.log($("#slider-icon").val());
+    let index = $("#slider-icon").val();
+    $("#slider-value").text(index);
+    clearInterval(intervalId);
+
+    console.log(scalarFetch);
+    Promise.all([scalarFetch, gradientFetch]).then((jsonList) => {
+        const scalarFields = jsonList[0];
+        const gradientFields = jsonList[1].data;
+        const xGradMax = jsonList[1].x_grad_max;
+        const yGradMax = jsonList[1].y_grad_max;
+
+        drawVector(scalarFields[index], gradientFields[index], xGradMax, yGradMax);
+        draw3D(scalarFields[index]);
+    });
+});
 
 Promise.all([scalarFetch, gradientFetch]).then((jsonList) => {
     const scalarFields = jsonList[0];
@@ -66,15 +80,17 @@ Promise.all([scalarFetch, gradientFetch]).then((jsonList) => {
     const yGradMax = jsonList[1].y_grad_max;
 
     let playIndex = 0;
-    setInterval(() => {
+    intervalId = setInterval(() => {
         if (playIndex === scalarFields.length) {
             playIndex = 0;
         }
         drawVector(scalarFields[playIndex], gradientFields[playIndex], xGradMax, yGradMax);
         draw3D(scalarFields[playIndex]);
         playIndex++;
+        console.log(playIndex);
     }, 500);
 });
+
 
 function drawVector(scalarField, gradientField, xGradMax, yGradMax) {
     const colors = colormap({
