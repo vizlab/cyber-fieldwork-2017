@@ -59,3 +59,4 @@ cbar_ax = fig.add_axes([0.9, 0.15, 0.03, 0.7])
 cbar_ax.set_xlabel('$T$ / K', labelpad=20)
 fig.colorbar(im, cax=cbar_ax)
 plt.show()
+
