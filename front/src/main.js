@@ -121,7 +121,9 @@ let renderer =  {
     }
 }
 
-const scalarFetch = fetch('data.json').then(response => response.json());
+const dataName = 'data.json';
+// const dataName = 'convection-diffusion.json';
+const scalarFetch = fetch(dataName).then(response => response.json());
 const gradientFetch = fetch('gradient-fields.json').then(response => response.json());
 let intervalId = 0;
 $("#slider-icon").on("input", function() {
