@@ -48,13 +48,82 @@ const layout = {
     }
 };
 
-
 Plotly.newPlot('plotlyDiv', [], layout);
+
+let renderer =  {
+    type : "cycle", //0-cycle, 1-slider
+    dataType : 0, //0-diffusion 1-convaction 2-convaction-diffusion
+    cycleId : 0, //the cycle event id
+    data: null, //vector data
+
+    "init" : function() {
+        let scalarFetch = fetch('data.json').then(response => response.json());
+        let gradientFetch = fetch('gradient-fields.json').then(response => response.json());
+    },
+
+    "changeType" : function(type) {
+        if (type == "cycle") {
+            if (this.cycleId == 0) {
+                this.cycleInit();
+            }
+        } else if (type == "slider") {
+            if (this.cycleId != 0) {
+                this.cyclePause();
+            }
+        }
+        this.type = type;
+    },
+
+    "cycleInit" : function() {
+
+    },
+
+    "cyclePause" : function() {
+
+    },
+
+    "drawVector" : function() {
+        const colors = colormap({
+            colormap: 'jet',
+            nshades: 701,
+            format: 'hex',
+            alpha: 1
+        });
+        const canvas = document.getElementById('app');
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.beginPath();
+
+        const SCALE = 5;
+        for (let x = 0; x < 100; x++) {
+            for (let y = 0; y < 100; y++) {;
+                ctx.fillStyle = colors[parseInt(scalarField[x][y])];
+                ctx.fillRect(x * SCALE, y * SCALE, SCALE, SCALE);
+            }
+        }
+
+        const arrowInterval = 5;
+        for (let x = 0; x < 100; x += arrowInterval) {
+            for (let y = 0; y < 100; y += arrowInterval) {
+                const xGrad = gradientField.x[x][y];
+                const yGrad = - gradientField.y[x][y];
+                const theta = - Math.atan2(yGrad, xGrad);
+                const r = 50 * Math.sqrt(Math.pow(xGrad / xGradMax,2) + Math.pow(yGrad / yGradMax,2));
+                if (r < 1) {
+                    continue;
+                }
+                const p0 = {x: x * SCALE, y: y * SCALE};
+                const p1 = {x: (x - r * Math.cos(theta)) * SCALE, y: (y - r * Math.sin(theta)) * SCALE };
+                drawLineWithArrowhead(p0, p1, 3, ctx);
+            }
+        }
+        ctx.stroke();
+    }
+}
 
 const scalarFetch = fetch('data.json').then(response => response.json());
 const gradientFetch = fetch('gradient-fields.json').then(response => response.json());
 let intervalId = 0;
-
 $("#slider-icon").on("input", function() {
     // console.log($("#slider-icon").val());
     let index = $("#slider-icon").val();
