@@ -1,6 +1,6 @@
 import colormap from 'colormap';
 import $ from 'jquery';
-import slider from 'bootstrap-slider';
+import 'babel-polyfill';
 
 const layout = {
     title: 'Diffusion Equation Simulation',
@@ -50,39 +50,48 @@ const layout = {
 
 Plotly.newPlot('plotlyDiv', [], layout);
 
-let renderer =  {
+let renderer = {
     type : "cycle", //0-cycle, 1-slider
     dataType : 0, //0-diffusion 1-convaction 2-convaction-diffusion
     cycleId : 0, //the cycle event id
-    data: null, //vector data
+    vData : {},
+    setting : {},
 
-    "init" : function() {
-        let scalarFetch = fetch('data.json').then(response => response.json());
-        let gradientFetch = fetch('gradient-fields.json').then(response => response.json());
+    init : function() {
+        fetch('data.json').then(response => response.json()).then(jsonData => {
+            this.vData['scalar'] = jsonData;
+        });
+        return fetch('gradient-fields.json').then(response => response.json()).then(jsonData => {
+            this.vData['gradient'] = jsonData['data'];
+            this.setting['xGrad'] = jsonData['x_grad_max'];
+            this.setting['yGrad'] = jsonData['y_grad_max'];
+        });
     },
 
-    "changeType" : function(type) {
-        if (type == "cycle") {
-            if (this.cycleId == 0) {
-                this.cycleInit();
+    cycleInit : function() {
+        let playIndex = 0;
+        this.intervalId = setInterval(() => {
+            if (playIndex === this.vData['scalar'].length) {
+                playIndex = 0;
             }
-        } else if (type == "slider") {
-            if (this.cycleId != 0) {
-                this.cyclePause();
-            }
-        }
-        this.type = type;
+            this.printGraph(playIndex);
+            $("#slider-icon").val(playIndex);
+            $("#slider-value").text(playIndex);
+            playIndex++;
+            console.log(playIndex);
+        }, 500);
     },
 
-    "cycleInit" : function() {
-
+    cyclePause : function() {
+        clearInterval(this.intervalId);
     },
 
-    "cyclePause" : function() {
-
+    printGraph : function(timeStep) {
+        this.drawVector(this.vData['scalar'][timeStep], this.vData['gradient'][timeStep], this.setting['xGrad'], this.setting['yGrad']);
+        this.draw3D(this.vData['scalar'][timeStep]);
     },
 
-    "drawVector" : function() {
+    drawVector : function(scalarField, gradientField, xGradMax, yGradMax) {
         const colors = colormap({
             colormap: 'jet',
             nshades: 701,
@@ -114,134 +123,70 @@ let renderer =  {
                 }
                 const p0 = {x: x * SCALE, y: y * SCALE};
                 const p1 = {x: (x - r * Math.cos(theta)) * SCALE, y: (y - r * Math.sin(theta)) * SCALE };
-                drawLineWithArrowhead(p0, p1, 3, ctx);
+                this.drawLineWithArrowhead(p0, p1, 3, ctx);
             }
         }
         ctx.stroke();
-    }
-}
+    },
 
-const dataName = 'data.json';
-// const dataName = 'convection-diffusion.json';
-const scalarFetch = fetch(dataName).then(response => response.json());
-const gradientFetch = fetch('gradient-fields.json').then(response => response.json());
-let intervalId = 0;
+    drawLineWithArrowhead : function(p0, p1, headLength, ctx) {
+        const degreesInRadians225 = 225 * Math.PI / 180;
+        const degreesInRadians135 = 135 * Math.PI / 180;
+
+        // calc the angle of the line
+        const dx = p1.x - p0.x;
+        const dy = p1.y - p0.y;
+        const angle = Math.atan2(dy, dx);
+
+        // calc arrowhead points
+        const x225 = p1.x + headLength * Math.cos(angle + degreesInRadians225);
+        const y225 = p1.y + headLength * Math.sin(angle + degreesInRadians225);
+        const x135 = p1.x + headLength * Math.cos(angle + degreesInRadians135);
+        const y135 = p1.y + headLength * Math.sin(angle + degreesInRadians135);
+
+        ctx.beginPath();
+        // draw the line from p0 to p1
+        ctx.moveTo(p0.x, p0.y);
+        ctx.lineTo(p1.x, p1.y);
+        // draw partial arrowhead at 225 degrees
+        ctx.moveTo(p1.x, p1.y);
+        ctx.lineTo(x225, y225);
+        // draw partial arrowhead at 135 degrees
+        ctx.moveTo(p1.x, p1.y);
+        ctx.lineTo(x135, y135);
+        // stroke the line and arrowhead
+        ctx.stroke();
+    },
+
+    draw3D : function(vecArray) {
+        const data = [{
+            z: vecArray,
+            type: 'surface',
+            autocolorscale: false,
+            cauto: false,
+            cmax: 700,
+            cmin: 0,
+        }];
+
+        const plotDiv = document.getElementById('plotlyDiv');
+        plotDiv.data = data;
+        Plotly.redraw('plotlyDiv');
+    },
+};
+
+(async function() {
+    await renderer.init();
+    renderer.cycleInit();
+})();
+
 $("#slider-icon").on("input", function() {
-    // console.log($("#slider-icon").val());
     let index = $("#slider-icon").val();
     $("#slider-value").text(index);
-    clearInterval(intervalId);
-
-    console.log(scalarFetch);
-    Promise.all([scalarFetch, gradientFetch]).then((jsonList) => {
-        const scalarFields = jsonList[0];
-        const gradientFields = jsonList[1].data;
-        const xGradMax = jsonList[1].x_grad_max;
-        const yGradMax = jsonList[1].y_grad_max;
-
-        drawVector(scalarFields[index], gradientFields[index], xGradMax, yGradMax);
-        draw3D(scalarFields[index]);
-    });
+    renderer.cyclePause();
+    renderer.type = 'slider';
+    renderer.printGraph(index);
 });
 
-Promise.all([scalarFetch, gradientFetch]).then((jsonList) => {
-    const scalarFields = jsonList[0];
-    const gradientFields = jsonList[1].data;
-    const xGradMax = jsonList[1].x_grad_max;
-    const yGradMax = jsonList[1].y_grad_max;
-
-    let playIndex = 0;
-    intervalId = setInterval(() => {
-        if (playIndex === scalarFields.length) {
-            playIndex = 0;
-        }
-        drawVector(scalarFields[playIndex], gradientFields[playIndex], xGradMax, yGradMax);
-        draw3D(scalarFields[playIndex]);
-        playIndex++;
-        console.log(playIndex);
-    }, 500);
+$("#auto").on("click", function() {
+    renderer.cycleInit();
 });
-
-
-function drawVector(scalarField, gradientField, xGradMax, yGradMax) {
-    const colors = colormap({
-        colormap: 'jet',
-        nshades: 701,
-        format: 'hex',
-        alpha: 1
-    });
-    const canvas = document.getElementById('app');
-    const ctx = canvas.getContext('2d');
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.beginPath();
-
-    const SCALE = 5;
-    for (let x = 0; x < 100; x++) {
-        for (let y = 0; y < 100; y++) {;
-            ctx.fillStyle = colors[parseInt(scalarField[x][y])];
-            ctx.fillRect(x * SCALE, y * SCALE, SCALE, SCALE);
-        }
-    }
-
-    const arrowInterval = 5;
-    for (let x = 0; x < 100; x += arrowInterval) {
-        for (let y = 0; y < 100; y += arrowInterval) {
-            const xGrad = gradientField.x[x][y];
-            const yGrad = - gradientField.y[x][y];
-            const theta = - Math.atan2(yGrad, xGrad);
-            const r = 50 * Math.sqrt(Math.pow(xGrad / xGradMax,2) + Math.pow(yGrad / yGradMax,2));
-            if (r < 1) {
-                continue;
-            }
-            const p0 = {x: x * SCALE, y: y * SCALE};
-            const p1 = {x: (x - r * Math.cos(theta)) * SCALE, y: (y - r * Math.sin(theta)) * SCALE };
-            drawLineWithArrowhead(p0, p1, 3, ctx);
-        }
-    }
-    ctx.stroke();
-}
-
-// ref: https://stackoverflow.com/questions/26804679/how-can-i-draw-arrows-on-a-canvas-with-mouse
-function drawLineWithArrowhead(p0, p1, headLength, ctx){
-    const degreesInRadians225 = 225 * Math.PI / 180;
-    const degreesInRadians135 = 135 * Math.PI / 180;
-
-    // calc the angle of the line
-    const dx = p1.x - p0.x;
-    const dy = p1.y - p0.y;
-    const angle = Math.atan2(dy, dx);
-
-    // calc arrowhead points
-    const x225 = p1.x + headLength * Math.cos(angle + degreesInRadians225);
-    const y225 = p1.y + headLength * Math.sin(angle + degreesInRadians225);
-    const x135 = p1.x + headLength * Math.cos(angle + degreesInRadians135);
-    const y135 = p1.y + headLength * Math.sin(angle + degreesInRadians135);
-
-    ctx.beginPath();
-    // draw the line from p0 to p1
-    ctx.moveTo(p0.x, p0.y);
-    ctx.lineTo(p1.x, p1.y);
-    // draw partial arrowhead at 225 degrees
-    ctx.moveTo(p1.x, p1.y);
-    ctx.lineTo(x225, y225);
-    // draw partial arrowhead at 135 degrees
-    ctx.moveTo(p1.x, p1.y);
-    ctx.lineTo(x135, y135);
-    // stroke the line and arrowhead
-    ctx.stroke();
-}
-
-function draw3D(vecArray) {
-    const data = [{
-        z: vecArray,
-        type: 'surface',
-        autocolorscale: false,
-        cauto: false,
-        cmax: 700,
-        cmin: 0,
-    }];
-
-    const plotDiv = document.getElementById('plotlyDiv');
-    plotDiv.data = data;
-    Plotly.redraw('plotlyDiv');
-}
