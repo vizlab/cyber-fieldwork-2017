@@ -53,23 +53,41 @@ Plotly.newPlot('plotlyDiv', [], layout);
 let renderer = {
     type : "cycle", //0-cycle, 1-slider
     dataType : 0, //0-diffusion 1-convaction 2-convaction-diffusion
+    dataName : [ "diffusion", "convaction", "convaction-diffusion"],
+    typeFile : [
+        ["data.json", "gradient-fields.json"],
+        ["data.json", "gradient-fields.json"],
+        ["convection-diffusion.json", "gradient-fields,json"]
+    ],
     cycleId : 0, //the cycle event id
     vData : {},
     setting : {},
+    colors : colormap({
+        colormap: 'jet',
+        nshades: 701,
+        format: 'hex',
+        alpha: 1
+    }),
+    canvas : document.getElementById('app'),
+    ctx : document.getElementById('app').getContext('2d'),
 
     init : function() {
-        fetch('data.json').then(response => response.json()).then(jsonData => {
+        let fileNames = this.typeFile[this.dataType];
+        $("#name").text(this.dataName[this.dataType]);
+        fetch(fileNames[0]).then(response => response.json()).then(jsonData => {
             this.vData['scalar'] = jsonData;
         });
-        return fetch('gradient-fields.json').then(response => response.json()).then(jsonData => {
+        return fetch(fileNames[1]).then(response => response.json()).then(jsonData => {
             this.vData['gradient'] = jsonData['data'];
             this.setting['xGrad'] = jsonData['x_grad_max'];
             this.setting['yGrad'] = jsonData['y_grad_max'];
         });
     },
 
+    //cycle start
     cycleInit : function() {
         let playIndex = 0;
+        renderer.type = 'cycle';
         this.intervalId = setInterval(() => {
             if (playIndex === this.vData['scalar'].length) {
                 playIndex = 0;
@@ -82,32 +100,27 @@ let renderer = {
         }, 500);
     },
 
+    //stop cycle
     cyclePause : function() {
         clearInterval(this.intervalId);
     },
 
+    //draw all the graph, including vector and 3Dgraph
     printGraph : function(timeStep) {
         this.drawVector(this.vData['scalar'][timeStep], this.vData['gradient'][timeStep], this.setting['xGrad'], this.setting['yGrad']);
         this.draw3D(this.vData['scalar'][timeStep]);
     },
 
+    //draw vector
     drawVector : function(scalarField, gradientField, xGradMax, yGradMax) {
-        const colors = colormap({
-            colormap: 'jet',
-            nshades: 701,
-            format: 'hex',
-            alpha: 1
-        });
-        const canvas = document.getElementById('app');
-        const ctx = canvas.getContext('2d');
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.beginPath();
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        this.ctx.beginPath();
 
         const SCALE = 5;
         for (let x = 0; x < 100; x++) {
             for (let y = 0; y < 100; y++) {;
-                ctx.fillStyle = colors[parseInt(scalarField[x][y])];
-                ctx.fillRect(x * SCALE, y * SCALE, SCALE, SCALE);
+                this.ctx.fillStyle = this.colors[parseInt(scalarField[x][y])];
+                this.ctx.fillRect(x * SCALE, y * SCALE, SCALE, SCALE);
             }
         }
 
@@ -123,12 +136,13 @@ let renderer = {
                 }
                 const p0 = {x: x * SCALE, y: y * SCALE};
                 const p1 = {x: (x - r * Math.cos(theta)) * SCALE, y: (y - r * Math.sin(theta)) * SCALE };
-                this.drawLineWithArrowhead(p0, p1, 3, ctx);
+                this.drawLineWithArrowhead(p0, p1, 3, this.ctx);
             }
         }
-        ctx.stroke();
+        this.ctx.stroke();
     },
 
+    //draw the arrow in vector
     drawLineWithArrowhead : function(p0, p1, headLength, ctx) {
         const degreesInRadians225 = 225 * Math.PI / 180;
         const degreesInRadians135 = 135 * Math.PI / 180;
@@ -144,20 +158,21 @@ let renderer = {
         const x135 = p1.x + headLength * Math.cos(angle + degreesInRadians135);
         const y135 = p1.y + headLength * Math.sin(angle + degreesInRadians135);
 
-        ctx.beginPath();
+        this.ctx.beginPath();
         // draw the line from p0 to p1
-        ctx.moveTo(p0.x, p0.y);
-        ctx.lineTo(p1.x, p1.y);
+        this.ctx.moveTo(p0.x, p0.y);
+        this.ctx.lineTo(p1.x, p1.y);
         // draw partial arrowhead at 225 degrees
-        ctx.moveTo(p1.x, p1.y);
-        ctx.lineTo(x225, y225);
+        this.ctx.moveTo(p1.x, p1.y);
+        this.ctx.lineTo(x225, y225);
         // draw partial arrowhead at 135 degrees
-        ctx.moveTo(p1.x, p1.y);
-        ctx.lineTo(x135, y135);
+        this.ctx.moveTo(p1.x, p1.y);
+        this.ctx.lineTo(x135, y135);
         // stroke the line and arrowhead
-        ctx.stroke();
+        this.ctx.stroke();
     },
 
+    //draw 3D graph
     draw3D : function(vecArray) {
         const data = [{
             z: vecArray,
@@ -189,4 +204,14 @@ $("#slider-icon").on("input", function() {
 
 $("#auto").on("click", function() {
     renderer.cycleInit();
+});
+
+$("#typeChange input").on("change", async function() {
+    let datatype = $("input[name='datatype']:checked").val();
+    if (datatype !== renderer.datatype && renderer.type == "cycle") {
+        renderer.cyclePause();
+        renderer.dataType = datatype;
+        await renderer.init();
+        renderer.cycleInit();
+    }
 });
