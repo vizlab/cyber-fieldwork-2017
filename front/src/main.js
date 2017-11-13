@@ -50,7 +50,7 @@ const layout = {
 
 Plotly.newPlot('plotlyDiv', [], layout);
 
-let renderer = {
+const renderer = {
     type : "cycle", //0-cycle, 1-slider
     dataType : 0, //0-diffusion 1-convaction 2-convection-diffusion
     dataName : [ "diffusion", "convection", "convection-diffusion"],
@@ -73,7 +73,7 @@ let renderer = {
     ctx : document.getElementById('app').getContext('2d'),
 
     init : function() {
-        let fileNames = this.typeFile[this.dataType];
+        const fileNames = this.typeFile[this.dataType];
         $("#name").text(this.dataName[this.dataType]);
         fetch(fileNames[0]).then(response => response.json()).then(jsonData => {
             this.vData['scalar'] = jsonData;
@@ -195,7 +195,7 @@ let renderer = {
 })();
 
 $("#slider-icon").on("input", function() {
-    let index = $("#slider-icon").val();
+    const index = $("#slider-icon").val();
     $("#slider-value").text(index);
     renderer.cyclePause();
     renderer.type = 'slider';
@@ -211,7 +211,7 @@ $("#auto").on("click", function() {
 });
 
 $("#typeChange input").on("change", async function() {
-    let datatype = $("input[name='datatype']:checked").val();
+    const datatype = $("input[name='datatype']:checked").val();
     if (datatype !== renderer.datatype) {
         if (renderer.type === "cycle") {
             renderer.cyclePause();
