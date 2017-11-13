@@ -53,13 +53,14 @@ Plotly.newPlot('plotlyDiv', [], layout);
 let renderer = {
     type : "cycle", //0-cycle, 1-slider
     dataType : 0, //0-diffusion 1-convaction 2-convection-diffusion
-    dataName : [ "diffusion", "convaction", "convection-diffusion"],
+    dataName : [ "diffusion", "convection", "convection-diffusion"],
     typeFile : [
         ["diffusion.json", "gradient-fields.json"],
         ["data.json", "gradient-fields.json"],
         ["convection-diffusion.json", "gradient-fields.json"]
     ],
     cycleId : 0, //the cycle event id
+    stepId : 0,
     vData : {},
     setting : {},
     colors : colormap({
@@ -86,17 +87,16 @@ let renderer = {
 
     //cycle start
     cycleInit : function() {
-        let playIndex = 0;
         renderer.type = 'cycle';
         this.intervalId = setInterval(() => {
-            if (playIndex === this.vData['scalar'].length) {
-                playIndex = 0;
+            if (this.stepId === this.vData['scalar'].length) {
+                this.stepId = 0;
             }
-            this.printGraph(playIndex);
-            $("#slider-icon").val(playIndex);
-            $("#slider-value").text(playIndex);
-            playIndex++;
-            console.log(playIndex);
+            this.printGraph(this.stepId);
+            $("#slider-icon").val(this.stepId);
+            $("#slider-value").text(this.stepId);
+            this.stepId++;
+            console.log(this.stepId);
         }, 500);
     },
 
@@ -199,6 +199,7 @@ $("#slider-icon").on("input", function() {
     $("#slider-value").text(index);
     renderer.cyclePause();
     renderer.type = 'slider';
+    renderer.stepId = index;
     renderer.printGraph(index);
 });
 
@@ -211,10 +212,13 @@ $("#auto").on("click", function() {
 
 $("#typeChange input").on("change", async function() {
     let datatype = $("input[name='datatype']:checked").val();
-    if (datatype !== renderer.datatype && renderer.type === "cycle") {
-        renderer.cyclePause();
+    if (datatype !== renderer.datatype) {
+        if (renderer.type === "cycle") {
+            renderer.cyclePause();
+        }
         renderer.dataType = datatype;
         await renderer.init();
+        renderer.stepId = 0;
         renderer.cycleInit();
     }
 });
