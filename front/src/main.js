@@ -52,12 +52,12 @@ Plotly.newPlot('plotlyDiv', [], layout);
 
 let renderer = {
     type : "cycle", //0-cycle, 1-slider
-    dataType : 0, //0-diffusion 1-convaction 2-convaction-diffusion
-    dataName : [ "diffusion", "convaction", "convaction-diffusion"],
+    dataType : 0, //0-diffusion 1-convaction 2-convection-diffusion
+    dataName : [ "diffusion", "convaction", "convection-diffusion"],
     typeFile : [
+        ["diffusion.json", "gradient-fields.json"],
         ["data.json", "gradient-fields.json"],
-        ["data.json", "gradient-fields.json"],
-        ["convection-diffusion.json", "gradient-fields,json"]
+        ["convection-diffusion.json", "gradient-fields.json"]
     ],
     cycleId : 0, //the cycle event id
     vData : {},
@@ -118,7 +118,7 @@ let renderer = {
 
         const SCALE = 5;
         for (let x = 0; x < 100; x++) {
-            for (let y = 0; y < 100; y++) {;
+            for (let y = 0; y < 100; y++) {
                 this.ctx.fillStyle = this.colors[parseInt(scalarField[x][y])];
                 this.ctx.fillRect(x * SCALE, y * SCALE, SCALE, SCALE);
             }
@@ -203,12 +203,15 @@ $("#slider-icon").on("input", function() {
 });
 
 $("#auto").on("click", function() {
+    if (renderer.type === "cycle") {
+        renderer.cyclePause();
+    }
     renderer.cycleInit();
 });
 
 $("#typeChange input").on("change", async function() {
     let datatype = $("input[name='datatype']:checked").val();
-    if (datatype !== renderer.datatype && renderer.type == "cycle") {
+    if (datatype !== renderer.datatype && renderer.type === "cycle") {
         renderer.cyclePause();
         renderer.dataType = datatype;
         await renderer.init();
