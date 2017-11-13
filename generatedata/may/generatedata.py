@@ -47,7 +47,7 @@ for time in range(tSteps):
     if time % 10 == 0:
         dataList.append(u.tolist())
 
-filePath = './front/public/data.json'
+filePath = './front/public/diffusion.json'
 
 with open(filePath, 'w') as outfile:
     json.dump(dataList, outfile)
