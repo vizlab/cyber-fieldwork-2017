@@ -5,19 +5,19 @@
     <title>Cyber Fieldwork 2017</title>
     <script src="plotlyjsdist/plotly.min.js"></script>
     <style type="text/css">
-        #slider input {
+        #slider-icon {
             width: 150px;
             height: 20px;
             margin: 0;
-            transform-origin: 75px 75px;
-            transform: rotate(-90deg);
         }
         #slider-value {
-            margin:130px 6px;
+            margin-left:10px;
         }
     </style>
 </head>
 <body>
+    <div id="name" width="100%" style="text-align:center">
+    </div>
     <div style="display: flex">
         <div>
             <h4>方程式の可視化(2D) & 勾配の可視化</h4>
@@ -28,9 +28,17 @@
             <div id="plotlyDiv" width="500" height="500"></div>
         </div>
 
-        <div id="slider" height="500" width="500" display="inline-block">
-            <input type="range" id="slider-icon" min="0" max="50" step="1" value="0">
-            <div id="slider-value">0</div>
+        <div class="menu">
+            <div id="slider" height="500" width="500" display="inline-block">
+                <input type="range" id="slider-icon" min="0" max="50" step="1" value="0">
+                <span id="slider-value">0</span>
+            </div>
+            <button id="auto">auto</button>
+            <div id="typeChange">
+                <label> <input type="radio" name="datatype" value="0" checked="true">diffusion </label>
+                <label> <input type="radio" name="datatype" value="1">convection</label>
+                <label> <input type="radio" name="datatype" value="2">convection-diffusion</label>
+            </div>
         </div>
     </div>
     <script src="bundle.js"></script>
