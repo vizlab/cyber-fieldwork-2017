@@ -55,9 +55,9 @@ const renderer = {
     dataType : 0, //0-diffusion 1-convaction 2-convection-diffusion
     dataName : [ "diffusion", "convection", "convection-diffusion"],
     typeFile : [
-        ["diffusion.json", "gradient-fields.json"],
+        ["diffusion.json", "gradient-diffusion.json"],
         ["data.json", "gradient-fields.json"],
-        ["convection-diffusion.json", "gradient-fields.json"]
+        ["convection-diffusion.json", "gradient-convection-diffusion.json"]
     ],
     cycleId : 0, //the cycle event id
     stepId : 0,
