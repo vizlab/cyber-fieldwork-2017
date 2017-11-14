@@ -3769,7 +3769,7 @@ var renderer = {
     type: "cycle", //0-cycle, 1-slider
     dataType: 0, //0-diffusion 1-convaction 2-convection-diffusion
     dataName: ["diffusion", "convection", "convection-diffusion"],
-    typeFile: [["diffusion.json", "gradient-fields.json"], ["data.json", "gradient-fields.json"], ["convection-diffusion.json", "gradient-fields.json"]],
+    typeFile: [["diffusion.json", "gradient-diffusion.json"], ["data.json", "gradient-fields.json"], ["convection-diffusion.json", "gradient-convection-diffusion.json"]],
     cycleId: 0, //the cycle event id
     stepId: 0,
     vData: {},
@@ -3799,6 +3799,7 @@ var renderer = {
             _this.vData['gradient'] = jsonData['data'];
             _this.setting['xGrad'] = jsonData['x_grad_max'];
             _this.setting['yGrad'] = jsonData['y_grad_max'];
+            _this.setting['sampling_interval'] = jsonData['sampling_interval'];
         });
     },
 
@@ -3826,12 +3827,12 @@ var renderer = {
 
     //draw all the graph, including vector and 3Dgraph
     printGraph: function printGraph(timeStep) {
-        this.drawVector(this.vData['scalar'][timeStep], this.vData['gradient'][timeStep], this.setting['xGrad'], this.setting['yGrad']);
+        this.drawVector(this.vData['scalar'][timeStep], this.vData['gradient'][timeStep], this.setting['xGrad'], this.setting['yGrad'], this.setting['sampling_interval']);
         this.draw3D(this.vData['scalar'][timeStep]);
     },
 
     //draw vector
-    drawVector: function drawVector(scalarField, gradientField, xGradMax, yGradMax) {
+    drawVector: function drawVector(scalarField, gradientField, xGradMax, yGradMax, samplingInterval) {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         this.ctx.beginPath();
 
@@ -3843,9 +3844,8 @@ var renderer = {
             }
         }
 
-        var arrowInterval = 5;
-        for (var _x = 0; _x < 100; _x += arrowInterval) {
-            for (var _y = 0; _y < 100; _y += arrowInterval) {
+        for (var _x = 0; _x < 100 / samplingInterval; _x++) {
+            for (var _y = 0; _y < 100 / samplingInterval; _y++) {
                 var xGrad = gradientField.x[_x][_y];
                 var yGrad = -gradientField.y[_x][_y];
                 var theta = -Math.atan2(yGrad, xGrad);
@@ -3853,8 +3853,8 @@ var renderer = {
                 if (r < 1) {
                     continue;
                 }
-                var p0 = { x: _x * SCALE, y: _y * SCALE };
-                var p1 = { x: (_x - r * Math.cos(theta)) * SCALE, y: (_y - r * Math.sin(theta)) * SCALE };
+                var p0 = { x: _x * samplingInterval * SCALE, y: _y * samplingInterval * SCALE };
+                var p1 = { x: (_x * samplingInterval - r * Math.cos(theta)) * SCALE, y: (_y * samplingInterval - r * Math.sin(theta)) * SCALE };
                 this.drawLineWithArrowhead(p0, p1, 3, this.ctx);
             }
         }
