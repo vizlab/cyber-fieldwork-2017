@@ -82,6 +82,7 @@ const renderer = {
             this.vData['gradient'] = jsonData['data'];
             this.setting['xGrad'] = jsonData['x_grad_max'];
             this.setting['yGrad'] = jsonData['y_grad_max'];
+            this.setting['sampling_interval'] = jsonData['sampling_interval']
         });
     },
 
@@ -107,12 +108,12 @@ const renderer = {
 
     //draw all the graph, including vector and 3Dgraph
     printGraph : function(timeStep) {
-        this.drawVector(this.vData['scalar'][timeStep], this.vData['gradient'][timeStep], this.setting['xGrad'], this.setting['yGrad']);
+        this.drawVector(this.vData['scalar'][timeStep], this.vData['gradient'][timeStep], this.setting['xGrad'], this.setting['yGrad'], this.setting['sampling_interval']);
         this.draw3D(this.vData['scalar'][timeStep]);
     },
 
     //draw vector
-    drawVector : function(scalarField, gradientField, xGradMax, yGradMax) {
+    drawVector : function(scalarField, gradientField, xGradMax, yGradMax, samplingInterval) {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         this.ctx.beginPath();
 
@@ -124,9 +125,8 @@ const renderer = {
             }
         }
 
-        const arrowInterval = 5;
-        for (let x = 0; x < 100; x += arrowInterval) {
-            for (let y = 0; y < 100; y += arrowInterval) {
+        for (let x = 0; x < 100 / samplingInterval; x++) {
+            for (let y = 0; y < 100 / samplingInterval; y++) {
                 const xGrad = gradientField.x[x][y];
                 const yGrad = - gradientField.y[x][y];
                 const theta = - Math.atan2(yGrad, xGrad);
@@ -134,8 +134,8 @@ const renderer = {
                 if (r < 1) {
                     continue;
                 }
-                const p0 = {x: x * SCALE, y: y * SCALE};
-                const p1 = {x: (x - r * Math.cos(theta)) * SCALE, y: (y - r * Math.sin(theta)) * SCALE };
+                const p0 = {x: x * samplingInterval * SCALE, y: y * samplingInterval  * SCALE};
+                const p1 = {x: (x * samplingInterval - r * Math.cos(theta)) * SCALE, y: (y * samplingInterval - r * Math.sin(theta)) * SCALE };
                 this.drawLineWithArrowhead(p0, p1, 3, this.ctx);
             }
         }
