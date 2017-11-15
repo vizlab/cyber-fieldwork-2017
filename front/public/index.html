@@ -73,51 +73,88 @@
             </div>
         </div>
 
-        <div class="field is-horizontal">
-            <div class="field-label">
-                タイムステップ
-            </div>
-            <div class="field-body">
-                <div id="slider" height="500" width="500" display="inline-block">
-                    <input type="range" id="slider-icon" class="input-range" min="0" max="50" step="1" value="0">
-                    <span id="slider-value">0</span>
-                </div>
-            </div>
-        </div>
-
-        <div class="field is-horizontal">
-            <div class="field-label">
-                　自動モード
-            </div>
-            <div class="field-body">
-                <button id="auto" class="button is-info">auto</button>
-            </div>
-        </div>
-
-        <div class="field is-horizontal">
-            <div class="field-label">
-                可視化する方程式
-            </div>
-            <div class="field-body">
-                <div id="typeChange" class="control">
-                    <label class="radio">
-                        <input type="radio" name="datatype" value="0" checked="true">
-                        拡散方程式
-                    </label>
-                    <label class="radio">
-                        <input type="radio" name="datatype" value="1">
-                        移流方程式
-                    </label>
-                    <label class="radio">
-                        <input type="radio" name="datatype" value="2">
-                        移流拡散方程式
-                    </label>
+        <div class="columns">
+            <div class="column">
+                <div class="field is-horizontal">
+                    <div class="field-label">
+                        タイムステップ
+                    </div>
+                    <div class="field-body">
+                        <div id="slider" height="500" width="500" display="inline-block">
+                            <input type="range" id="slider-icon" class="input-range" min="0" max="50" step="1" value="0">
+                            <span id="slider-value">0</span>
+                        </div>
+                    </div>
                 </div>
 
+                <div class="field is-horizontal">
+                    <div class="field-label">
+                        　自動モード
+                    </div>
+                    <div class="field-body">
+                        <button id="auto" class="button is-info">auto</button>
+                    </div>
+                </div>
+
+                <div class="field is-horizontal">
+                    <div class="field-label">
+                        可視化する方程式
+                    </div>
+                    <div class="field-body">
+                        <div id="typeChange" class="control">
+                            <label class="radio">
+                                <input type="radio" name="datatype" value="0" checked="true">
+                                拡散方程式
+                            </label>
+                            <label class="radio">
+                                <input type="radio" name="datatype" value="1">
+                                移流方程式
+                            </label>
+                            <label class="radio">
+                                <input type="radio" name="datatype" value="2">
+                                移流拡散方程式
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="column">
+                移流方程式のベクトルの方向
+                <p class="field">
+                    <a class="button is-large" style="left: 120px">
+                        <span class="icon">
+                            <i class="arrow up icon"></i>
+                        </span>
+                    </a>
+                </p>
+
+                <div class="field is-horizontal">
+                    <p class="field">
+                        <a class="button is-large" style="left: 55px">
+                            <span class="icon">
+                                <i class="arrow left icon"></i>
+                            </span>
+                        </a>
+                    </p>
+                    <p class="field">
+                        <a class="button  is-large" style="left: 130px">
+                            <span class="icon">
+                                <i class="arrow right icon"></i>
+                            </span>
+                        </a>
+                    </p>
+                </div>
+
+                <p class="field">
+                    <a class="button is-large" style="left: 120px; top: -15px">
+                        <span class="icon">
+                            <i class="arrow down icon"></i>
+                        </span>
+                    </a>
+                </p>
             </div>
         </div>
     </div>
-
     <footer class="footer">
     </footer>
     <script src="bundle.js"></script>
