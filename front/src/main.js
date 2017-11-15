@@ -74,7 +74,6 @@ const renderer = {
 
     init : function() {
         const fileNames = this.typeFile[this.dataType];
-        $("#name").text(this.dataName[this.dataType]);
         fetch(fileNames[0]).then(response => response.json()).then(jsonData => {
             this.vData['scalar'] = jsonData;
         });
