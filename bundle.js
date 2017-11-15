@@ -3787,7 +3787,6 @@ var renderer = {
         var _this = this;
 
         var fileNames = this.typeFile[this.dataType];
-        (0, _jquery2.default)("#name").text(this.dataName[this.dataType]);
         fetch(fileNames[0]).then(function (response) {
             return response.json();
         }).then(function (jsonData) {

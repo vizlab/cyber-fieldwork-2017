@@ -2,7 +2,10 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Cyber Fieldwork 2017</title>
+    <link rel="stylesheet" href="./css/bulma.css">
+    <link rel="stylesheet" href="css/range.css">
     <script src="plotlyjsdist/plotly.min.js"></script>
     <style type="text/css">
         #slider-icon {
@@ -16,31 +19,79 @@
     </style>
 </head>
 <body>
-    <div id="name" width="100%" style="text-align:center">
-    </div>
-    <div style="display: flex">
-        <div>
-            <h4>方程式の可視化(2D) & 勾配の可視化</h4>
-            <canvas id="app" width="500" height="500"></canvas>
+    <section class="hero is-info">
+        <div class="hero-body">
+            <div class="container">
+                <h1 class="title">
+                    Cyber Fieldwork 2017
+                </h1>
+                <h2 class="subtitle">
+                    スパコンの計算結果の可視化
+                </h2>
+            </div>
         </div>
-        <div>
-            <h4>方程式の可視化(3D)</h4>
-            <div id="plotlyDiv" width="500" height="500"></div>
+    </section>
+
+    <div class="container" style="margin-top: 20px">
+        <div class="columns">
+            <div class="column">
+                <div class="card">
+                    <header class="card-header">
+                        <p class="card-header-title">
+                            方程式の可視化(2D) & 勾配の可視化
+                        </p>
+                    </header>
+                    <div class="card-content">
+                        <canvas id="app" width="500" height="500"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="column">
+                <div class="card">
+                    <header class="card-header">
+                        <p class="card-header-title">
+                            方程式の可視化(3D)
+                        </p>
+                    </header>
+                    <div class="card-content">
+                        <div id="plotlyDiv" width="500" height="500"></div>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <div class="menu">
-            <div id="slider" height="500" width="500" display="inline-block">
-                <input type="range" id="slider-icon" min="0" max="50" step="1" value="0">
-                <span id="slider-value">0</span>
+        <div class="field">
+
+            <div class="control">
+                <label class="input">
+                    <input type="range" id="slider-icon" class="input-range" min="0" max="50" step="1" value="0">
+                    <span id="slider-value">0</span>
+                </label>
             </div>
-            <button id="auto">auto</button>
-            <div id="typeChange">
-                <label> <input type="radio" name="datatype" value="0" checked="true">diffusion </label>
-                <label> <input type="radio" name="datatype" value="1">convection</label>
-                <label> <input type="radio" name="datatype" value="2">convection-diffusion</label>
+
+            <div class="control">
+                <button id="auto" class="button is-info">auto</button>
+            </div>
+
+            <div id="typeChange" class="control">
+                <label class="radio">
+                    <input type="radio" name="datatype" value="0" checked="true">
+                    拡散方程式
+                </label>
+                <label class="radio">
+                    <input type="radio" name="datatype" value="1">
+                    移流方程式
+                </label>
+                <label class="radio">
+                    <input type="radio" name="datatype" value="2">
+                    移流拡散方程式
+                </label>
             </div>
         </div>
     </div>
+
+    <footer class="footer">
+    </footer>
     <script src="bundle.js"></script>
 </body>
 </html>
