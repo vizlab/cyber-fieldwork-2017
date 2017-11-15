@@ -3,7 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+
     <title>Cyber Fieldwork 2017</title>
+    <meta content="Cyber FieldWork 2017 - Visualization" name="Cyber FieldWork 2017">
+    <meta content="移流拡散方程式の可視化" name="description">
+    <meta content='キーワード, 5~6個がお薦め, 本文に書けなかったキーワード' name='keywords'>
+
+    <meta property="og:type" content="article"/>
+    <meta property="og:title" content="Cyber Fieldwork 2017"/>
+    <meta property="og:description" content="移流拡散方程式の可視化" />
+    <meta property="og:image" content="https://i.imgur.com/VNtRuns.png" />
+    <meta property="og:url" content="https://vizlab.github.io/cyber-fieldwork-2017/" />
+    <meta property="og:site_name" content="Vizlab"/>
+
     <link rel="stylesheet" href="./css/bulma.css">
     <link rel="stylesheet" href="css/range.css">
     <script src="plotlyjsdist/plotly.min.js"></script>
@@ -61,16 +73,12 @@
         </div>
 
         <div class="field">
-            <div class="control">
-                <label>
-                    <input type="range" id="slider-icon" class="input-range" min="0" max="50" step="1" value="0">
-                    <span id="slider-value">0</span>
-                </label>
+            <div id="slider" height="500" width="500" display="inline-block">
+                <input type="range" id="slider-icon" class="input-range" min="0" max="50" step="1" value="0">
+                <span id="slider-value">0</span>
             </div>
 
-            <div class="control">
-                <button id="auto" class="button is-info">auto</button>
-            </div>
+            <button id="auto" class="button is-info">auto</button>
 
             <div id="typeChange" class="control">
                 <label class="radio">
