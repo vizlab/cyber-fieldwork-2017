@@ -5,3 +5,4 @@ front/public/bundle.js
 .Rproj.user
 *.Rhistory
 ccm/*.json
+*.scssc
