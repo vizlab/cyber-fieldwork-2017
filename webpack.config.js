@@ -2,7 +2,7 @@ const path = require('path');
 const webpack = require('webpack');
 
 const options = {
-  entry: {
+  entry:{
     bundle: './front/src/main.js'
   },
   output: {
