@@ -96,7 +96,6 @@ const renderer = {
             $("#slider-icon").val(this.stepId);
             $("#slider-value").text(this.stepId);
             this.stepId++;
-            console.log(this.stepId);
         }, 500);
     },
 
