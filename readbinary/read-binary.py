@@ -1,12 +1,13 @@
 # encoding: utf-8
 
 import numpy as np
+import json
 import matplotlib
 from matplotlib import pyplot
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
-from scipy import genfromtxt
 
+data_list = []  # this array is saved as json
 
 # length of head is 16 bytes
 head = ("head","<i")
@@ -14,11 +15,11 @@ head = ("head","<i")
 dt = np.dtype([head, ("data","float32")])
 
 # fd = open('./Ra10^0/x3ds.bin', 'r')
-fd = open('./993/non-B/x3ds.bin', 'r')
+fd = open('./readbinary/993/non-B/x3ds.bin', 'r')
 chunk = np.fromfile(fd, dtype=dt)
 xyz_data = chunk["data"]
 
-fd = open('./993/non-B/u3ds.bin', 'r')
+fd = open('./readbinary/993/non-B/u3ds.bin', 'r')
 chunk = np.fromfile(fd, dtype=dt)
 uvwp_data = chunk["data"]
 
@@ -37,7 +38,7 @@ for (i, scalar) in enumerate(xyz_data):
         y.append(scalar)
     elif xyz_idx == 2:
         z.append(scalar)
-print(len(x), len(y), len(z))
+
 for t in range(41):
     head_idx = 4 * (t + 1) + (xyz_len * 4) * t
 
@@ -70,13 +71,17 @@ for t in range(41):
     p_zx = p_3d[:, 0, :]
     p_zx = p_zx.transpose() # shape is changed to u[x][z]
 
-    x_coord = np.linspace(min(x), max(x), n_x)
-    y_coord = np.linspace(min(y), max(y), n_y)
-    z_coord = np.linspace(min(z), max(z), n_z)
+    # reduce data
+    data_list.append(p_zx[::2, :].tolist())
 
-    z_mesh, x_mesh = np.meshgrid(z_coord, x_coord)
 
     if t % 10 == 0:
+        x_coord = np.linspace(min(x), max(x), n_x)
+        y_coord = np.linspace(min(y), max(y), n_y)
+        z_coord = np.linspace(min(z), max(z), n_z)
+
+        z_mesh, x_mesh = np.meshgrid(z_coord, x_coord)
+
         # draw 2d color plot
         ax = plt.subplot(1, 1, 1)
         ax.set_xlim(-0.5, 2.5)
@@ -86,6 +91,10 @@ for t in range(41):
         plt.colorbar()
         plt.show()
 
+filePath = './front/public/lock-exchange-993-nonB.json'
+
+with open(filePath, 'w') as outfile:
+    json.dump(data_list, outfile)
 
 # # draw 3d scatter
 # fig = pyplot.figure()
