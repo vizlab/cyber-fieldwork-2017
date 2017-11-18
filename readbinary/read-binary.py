@@ -18,24 +18,17 @@ fd = open('./681/B/x3ds.bin', 'r')
 chunk = np.fromfile(fd, dtype=dt)
 xyz_data = chunk["data"]
 
-fd = open('./681/B/u3ds.bin', 'r')
+fd = open('./681/non-B/u3ds.bin', 'r')
 chunk = np.fromfile(fd, dtype=dt)
 uvwp_data = chunk["data"]
 
-# cut 4 bytes
-xyz_data = xyz_data[2:]
-uvwp_data = uvwp_data[4:]
-# print(len(xyz_data), len(uvwp_data))
-xyz_len = len(xyz_data) // 3
+xyz_data = xyz_data[2:]         # cut 4 bytes
+xyz_len = len(xyz_data) // 3    # xyz_len = number of data in each time step
 
+# get xyz coordinates data
 x = [] # represented as x1 in the paper
 y = [] # represented as x2 in the paper
 z = [] # represented as x3 in the paper
-u = uvwp_data[:xyz_len]
-v = uvwp_data[xyz_len : xyz_len * 2]
-w = uvwp_data[xyz_len * 2 : xyz_len * 3]
-p = uvwp_data[xyz_len * 3 : xyz_len * 4]
-
 for (i, scalar) in enumerate(xyz_data):
     xyz_idx = int(i / xyz_len)
     if xyz_idx == 0:
@@ -44,23 +37,53 @@ for (i, scalar) in enumerate(xyz_data):
         y.append(scalar)
     elif xyz_idx == 2:
         z.append(scalar)
+print(len(x), len(y), len(z))
+for t in range(41):
+    head_idx = 4 * (t + 1) + (xyz_len * 4) * t
 
-# get x-y surface (z=0) only
-z0 = z[0]
-for (i, z_scalar) in enumerate(z):
-    if z_scalar != z0:
-        z0_len = i
-        break
+    u = uvwp_data[head_idx               : head_idx + xyz_len]
+    v = uvwp_data[head_idx + xyz_len     : head_idx + xyz_len * 2]
+    w = uvwp_data[head_idx + xyz_len * 2 : head_idx + xyz_len * 3]
+    p = uvwp_data[head_idx + xyz_len * 3 : head_idx + xyz_len * 4]
 
-# get sampling points of x coordinates
-x0 = x[0]
-for (i, x_scalar) in enumerate(x):
-    if x_scalar == x0 and i != 0:
-        x0_len = i
-        break
+    if t == 0:
+        # get x-y surface (z=0) only
+        z0 = z[0]
+        for (i, z_scalar) in enumerate(z):
+            if z_scalar != z0:
+                z0_len = i
+                break
 
-# get sampling points of y coordinates
-y0_len = z0_len // x0_len
+        # get sampling points of x coordinates
+        x0 = x[0]
+        for (i, x_scalar) in enumerate(x):
+            if x_scalar == x0 and i != 0:
+                n_x = i
+                break
+
+        # get sampling points of y coordinates and z_coordinates
+        n_y = z0_len // n_x
+        n_z = len(p) // n_x // n_y
+
+    # create 2d array for plot
+    p_0 = np.reshape(p[z0_len * 0:z0_len * 1], (n_y, n_x))
+    p_0 = p_0.transpose() # shape is changed to u[x][y]
+
+    x_coord = np.linspace(min(x), max(x), n_x)
+    y_coord = np.linspace(min(y), max(y), n_y)
+
+    y_mesh, x_mesh = np.meshgrid(y_coord, x_coord)
+
+    if t % 10 == 0:
+        # draw 2d color plot
+        ax = plt.subplot(1, 1, 1)
+        ax.set_xlim(-0.5, 2.5)
+        ax.set_ylim(-0.5, 2.5)
+        plt.pcolor(x_mesh, y_mesh, p_0, cmap='bwr', vmin=0, vmax=100)
+        plt.title('pcolorfast')
+        plt.colorbar()
+        plt.show()
+
 
 # # draw 3d scatter
 # fig = pyplot.figure()
@@ -77,21 +100,3 @@ y0_len = z0_len // x0_len
 #
 # ax.plot(x[:z0_len:10], y[:z0_len:10], p[:z0_len:10], "o", color="#cccccc")
 # pyplot.show()
-
-# create 2d array for plot
-u = np.reshape(p[:z0_len], (y0_len, x0_len))
-u = u.transpose() # shape is changed to u[x][y]
-
-x_coord = np.linspace(min(x), max(x), x0_len)
-y_coord = np.linspace(min(y), max(y), y0_len)
-
-y_mesh, x_mesh = np.meshgrid(y_coord, x_coord)
-
-# draw 2d color plot
-ax = plt.subplot(1, 1, 1)
-ax.set_xlim(-0.5, 2.5)
-ax.set_ylim(-0.5, 2.5)
-plt.pcolor(x_mesh, y_mesh, u, cmap='bwr', vmin=0, vmax=100)
-plt.title('pcolorfast')
-plt.colorbar()
-plt.show()
