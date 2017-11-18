@@ -46,12 +46,11 @@ export const getLayout = (dataType) => {
         }
     };
 
-    if (dataType === 3) {
+    if (dataType === LOCK_EXCHANGE) {
         layout.scene.xaxis.range = [0, 100];
         layout.scene.yaxis.range = [0, 200];
         layout.scene.zaxis.range = [-50, 150];
     }
 
     return layout;
-}
-
+};

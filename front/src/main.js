@@ -49,10 +49,18 @@ const renderer = {
         const typeFile = this.typeFile[this.dataType];
         this.canvas.width = typeFile.canvasWidth;
         this.canvas.height = typeFile.canvasHeight;
-        const fileNames = typeFile.fileNames;
+
+        this.colors = colormap({
+            colormap: 'jet',
+            nshades: (this.dataType === LOCK_EXCHANGE) ? 110 : 701,
+            format: 'hex',
+            alpha: 1
+        });
 
         const layout = getLayout(this.dataType);
-        Plotly.relayout('plotlyDiv', layout)
+        Plotly.relayout('plotlyDiv', layout);
+
+        const fileNames = typeFile.fileNames;
 
         fetch(fileNames[0]).then(response => response.json()).then(jsonData => {
             this.vData['scalar'] = jsonData;
