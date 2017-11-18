@@ -12,9 +12,11 @@ export const getLayout = (dataType) => {
                 z: 1,
             },
             xaxis: {
+                title: 'y', // label of x-axis is set as 'y' because array displayed in plotly is transposed
                 range: [0, 100],
             },
             yaxis: {
+                title: 'x',
                 range: [0, 100],
             },
             zaxis: {
