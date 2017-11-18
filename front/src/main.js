@@ -53,7 +53,6 @@ Plotly.newPlot('plotlyDiv', [], layout);
 const renderer = {
     type : "cycle", //0-cycle, 1-slider
     dataType : 0, //0-diffusion 1-convaction 2-convection-diffusion
-    dataName : [ "diffusion", "convection", "convection-diffusion"],
     typeFile : [
         ["diffusion.json", "gradient-diffusion.json"],
         ["convection.json", "gradient-convection.json"],
