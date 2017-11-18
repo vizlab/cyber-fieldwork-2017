@@ -1,3 +1,5 @@
+import { LOCK_EXCHANGE } from "./datatype-constants";
+
 export const getLayout = (dataType) => {
     const layout = {
         autosize: false,

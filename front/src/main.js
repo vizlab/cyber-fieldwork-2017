@@ -3,12 +3,13 @@ import $ from 'jquery';
 import 'babel-polyfill';
 
 import { getLayout } from './utils';
+import { DIFFUSION, LOCK_EXCHANGE } from "./datatype-constants";
 
 Plotly.newPlot('plotlyDiv', [], {});
 
 const renderer = {
     type : "cycle", //0-cycle, 1-slider
-    dataType : 0, //0-diffusion 1-convaction 2-convection-diffusion 3-lock-exchange
+    dataType : DIFFUSION, //0-diffusion 1-convaction 2-convection-diffusion 3-lock-exchange
     typeFile : [
         {
             fileNames: ["diffusion.json", "gradient-diffusion.json"],
@@ -162,7 +163,7 @@ const renderer = {
             cmax: 700,
             cmin: 0,
         }];
-        if (this.dataType === 3) {
+        if (this.dataType === LOCK_EXCHANGE) {
             data[0].cmax = 100;
             data[0].cmin = -50;
         }
