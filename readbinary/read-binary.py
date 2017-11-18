@@ -49,27 +49,49 @@ for (i, scalar) in enumerate(xyz_data):
 z0 = z[0]
 for (i, z_scalar) in enumerate(z):
     if z_scalar != z0:
-        z0_len = i - 1
+        z0_len = i
         break
-# draw graph
-fig = pyplot.figure()
-ax = Axes3D(fig)
 
-# set range
-ax.set_xlim(-0.5, 1.5)
-ax.set_ylim(-0.5, 1.5)
+# get sampling points of x coordinates
+x0 = x[0]
+for (i, x_scalar) in enumerate(x):
+    if x_scalar == x0 and i != 0:
+        x0_len = i
+        break
 
-# set labels
-ax.set_xlabel("X-axis")
-ax.set_ylabel("Y-axis")
-ax.set_zlabel("Z-axis")
+# get sampling points of y coordinates
+y0_len = z0_len // x0_len
 
-ax.plot(x[:z0_len], y[:z0_len], p[:z0_len], "o", color="#cccccc")
-pyplot.show()
+# # draw 3d scatter
+# fig = pyplot.figure()
+# ax = Axes3D(fig)
+#
+# # set range
+# ax.set_xlim(-0.5, 1.5)
+# ax.set_ylim(-0.5, 1.5)
+#
+# # set labels
+# ax.set_xlabel("X-axis")
+# ax.set_ylabel("Y-axis")
+# ax.set_zlabel("Z-axis")
+#
+# ax.plot(x[:z0_len:10], y[:z0_len:10], p[:z0_len:10], "o", color="#cccccc")
+# pyplot.show()
 
 # create 2d array for plot
-# u = []
-# for (idx, i) in enumerate(x[:z0_len]):
-#     u.append([])
-#     for j in y[:z0_len]:
-#         u[idx].append(j)
+u = np.reshape(p[:z0_len], (y0_len, x0_len))
+u = u.transpose() # shape is changed to u[x][y]
+
+x_coord = np.linspace(min(x), max(x), x0_len)
+y_coord = np.linspace(min(y), max(y), y0_len)
+
+y_mesh, x_mesh = np.meshgrid(y_coord, x_coord)
+
+# draw 2d color plot
+ax = plt.subplot(1, 1, 1)
+ax.set_xlim(-0.5, 2.5)
+ax.set_ylim(-0.5, 2.5)
+plt.pcolor(x_mesh, y_mesh, u, cmap='bwr', vmin=0, vmax=100)
+plt.title('pcolorfast')
+plt.colorbar()
+plt.show()
