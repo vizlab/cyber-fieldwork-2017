@@ -1,7 +1,7 @@
 import numpy as np
 import json, codecs
 
-file_names = ['diffusion', 'convection-diffusion', 'convection']
+file_names = ['diffusion', 'convection-diffusion', 'convection', 'lock-exchange-993-nonB']
 sampling_interval = 5
 
 for file_name in file_names:
