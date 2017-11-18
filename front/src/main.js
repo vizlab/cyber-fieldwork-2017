@@ -211,7 +211,7 @@ $("#auto").on("click", function() {
 });
 
 $("#typeChange input").on("change", async function() {
-    const datatype = $("input[name='datatype']:checked").val();
+    const datatype = Number($("input[name='datatype']:checked").val());
     if (datatype !== renderer.datatype) {
         if (renderer.type === "cycle") {
             renderer.cyclePause();
