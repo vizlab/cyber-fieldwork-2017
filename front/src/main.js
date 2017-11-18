@@ -2,61 +2,34 @@ import colormap from 'colormap';
 import $ from 'jquery';
 import 'babel-polyfill';
 
-const layout = {
-    title: 'Diffusion Equation Simulation',
-    autosize: false,
-    width: 500,
-    height: 500,
-    scene: {
-        aspectratio: {
-            x: 1,
-            y: 1,
-            z: 1,
-        },
-        xaxis: {
-            range: [0, 100],
-        },
-        yaxis: {
-            range: [0, 100],
-        },
-        zaxis: {
-            range: [0, 700],
-        },
-        camera: {
-            up: {
-                x: 0,
-                y: 0,
-                z: 0
-            },
-            center: {
-                x: 0,
-                y: 0,
-                z: 0
-            },
-            eye: {
-                x: -1.8,
-                y: -1.8,
-                z: 1.5
-            }
-        }
-    },
-    margin: {
-        l: 35,
-        r: 20,
-        b: 35,
-        t: 60,
-    }
-};
+import { getLayout } from './utils';
 
-Plotly.newPlot('plotlyDiv', [], layout);
+Plotly.newPlot('plotlyDiv', [], {});
 
 const renderer = {
     type : "cycle", //0-cycle, 1-slider
-    dataType : 0, //0-diffusion 1-convaction 2-convection-diffusion
+    dataType : 0, //0-diffusion 1-convaction 2-convection-diffusion 3-lock-exchange
     typeFile : [
-        ["diffusion.json", "gradient-diffusion.json"],
-        ["convection.json", "gradient-convection.json"],
-        ["convection-diffusion.json", "gradient-convection-diffusion.json"]
+        {
+            fileNames: ["diffusion.json", "gradient-diffusion.json"],
+            canvasWidth: 500,
+            canvasHeight: 500
+        },
+        {
+            fileNames: ["convection.json", "gradient-convection.json"],
+            canvasWidth: 500,
+            canvasHeight: 500
+        },
+        {
+            fileNames: ["convection-diffusion.json", "gradient-convection-diffusion.json"],
+            canvasWidth: 500,
+            canvasHeight: 500
+        },
+        {
+            fileNames: ["lock-exchange-993-nonB.json", "gradient-lock-exchange-993-nonB.json"],
+            canvasWidth: 885,
+            canvasHeight: 450
+        },
     ],
     cycleId : 0, //the cycle event id
     stepId : 0,
@@ -72,7 +45,14 @@ const renderer = {
     ctx : document.getElementById('app').getContext('2d'),
 
     init : function() {
-        const fileNames = this.typeFile[this.dataType];
+        const typeFile = this.typeFile[this.dataType];
+        this.canvas.width = typeFile.canvasWidth;
+        this.canvas.height = typeFile.canvasHeight;
+        const fileNames = typeFile.fileNames;
+
+        const layout = getLayout(this.dataType);
+        Plotly.relayout('plotlyDiv', layout)
+
         fetch(fileNames[0]).then(response => response.json()).then(jsonData => {
             this.vData['scalar'] = jsonData;
         });
@@ -182,6 +162,10 @@ const renderer = {
             cmax: 700,
             cmin: 0,
         }];
+        if (this.dataType === 3) {
+            data[0].cmax = 100;
+            data[0].cmin = -50;
+        }
 
         const plotDiv = document.getElementById('plotlyDiv');
         plotDiv.data = data;
