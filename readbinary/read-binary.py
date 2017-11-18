@@ -15,11 +15,11 @@ head = ("head","<i")
 dt = np.dtype([head, ("data","float32")])
 
 # fd = open('./Ra10^0/x3ds.bin', 'r')
-fd = open('./readbinary/993/non-B/x3ds.bin', 'r')
+fd = open('./readbinary/data/993/non-B/x3ds.bin', 'r')
 chunk = np.fromfile(fd, dtype=dt)
 xyz_data = chunk["data"]
 
-fd = open('./readbinary/993/non-B/u3ds.bin', 'r')
+fd = open('./readbinary/data/993/non-B/u3ds.bin', 'r')
 chunk = np.fromfile(fd, dtype=dt)
 uvwp_data = chunk["data"]
 

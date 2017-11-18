@@ -6,3 +6,4 @@ front/public/bundle.js
 *.Rhistory
 ccm/*.json
 *.scssc
+readbinary/data
