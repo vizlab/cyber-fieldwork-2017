@@ -110,7 +110,7 @@ const renderer = {
         for (let x = 0; x < NX; x++) {
             for (let y = 0; y < NY; y++) {
                 this.ctx.fillStyle = this.colors[parseInt(scalarField[x][y])];
-                this.ctx.fillRect(x * SCALE, this.canvas.height - y * SCALE, SCALE, SCALE);
+                this.ctx.fillRect(x * SCALE, y * SCALE, SCALE, SCALE);
             }
         }
 
