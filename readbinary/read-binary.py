@@ -71,7 +71,7 @@ for t in range(41):
     p_zx = p_3d[:, 0, :]
     p_zx = p_zx.transpose() # shape is changed to u[x][z]
 
-    # reduce data
+    # reduce data when save as json file
     data_list.append(p_zx[::2, :].tolist())
 
 
