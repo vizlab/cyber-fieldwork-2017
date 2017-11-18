@@ -117,15 +117,18 @@ const renderer = {
         this.ctx.beginPath();
 
         const SCALE = 5;
-        for (let x = 0; x < 100; x++) {
-            for (let y = 0; y < 100; y++) {
+        const NX = scalarField.length;      // NX is number of sampling points of x-axis
+        const NY = scalarField[0].length;   // NY is number of sampling points of y-axis
+
+        for (let x = 0; x < NX; x++) {
+            for (let y = 0; y < NY; y++) {
                 this.ctx.fillStyle = this.colors[parseInt(scalarField[x][y])];
                 this.ctx.fillRect(x * SCALE, y * SCALE, SCALE, SCALE);
             }
         }
 
-        for (let x = 0; x < 100 / samplingInterval; x++) {
-            for (let y = 0; y < 100 / samplingInterval; y++) {
+        for (let x = 0; x < NX / samplingInterval; x++) {
+            for (let y = 0; y < NY / samplingInterval; y++) {
                 const xGrad = gradientField.x[x][y];
                 const yGrad = - gradientField.y[x][y];
                 const theta = - Math.atan2(yGrad, xGrad);
