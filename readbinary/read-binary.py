@@ -14,11 +14,11 @@ head = ("head","<i")
 dt = np.dtype([head, ("data","float32")])
 
 # fd = open('./Ra10^0/x3ds.bin', 'r')
-fd = open('./681/B/x3ds.bin', 'r')
+fd = open('./993/non-B/x3ds.bin', 'r')
 chunk = np.fromfile(fd, dtype=dt)
 xyz_data = chunk["data"]
 
-fd = open('./681/non-B/u3ds.bin', 'r')
+fd = open('./993/non-B/u3ds.bin', 'r')
 chunk = np.fromfile(fd, dtype=dt)
 uvwp_data = chunk["data"]
 
@@ -66,20 +66,22 @@ for t in range(41):
         n_z = len(p) // n_x // n_y
 
     # create 2d array for plot
-    p_0 = np.reshape(p[z0_len * 0:z0_len * 1], (n_y, n_x))
-    p_0 = p_0.transpose() # shape is changed to u[x][y]
+    p_3d = np.reshape(p, (n_z, n_y, n_x))
+    p_zx = p_3d[:, 0, :]
+    p_zx = p_zx.transpose() # shape is changed to u[x][z]
 
     x_coord = np.linspace(min(x), max(x), n_x)
     y_coord = np.linspace(min(y), max(y), n_y)
+    z_coord = np.linspace(min(z), max(z), n_z)
 
-    y_mesh, x_mesh = np.meshgrid(y_coord, x_coord)
+    z_mesh, x_mesh = np.meshgrid(z_coord, x_coord)
 
     if t % 10 == 0:
         # draw 2d color plot
         ax = plt.subplot(1, 1, 1)
         ax.set_xlim(-0.5, 2.5)
         ax.set_ylim(-0.5, 2.5)
-        plt.pcolor(x_mesh, y_mesh, p_0, cmap='bwr', vmin=0, vmax=100)
+        plt.pcolor(z_mesh, x_mesh, p_zx, cmap='bwr', vmin=0, vmax=100)
         plt.title('pcolorfast')
         plt.colorbar()
         plt.show()
