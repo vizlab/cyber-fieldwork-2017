@@ -63,7 +63,7 @@ for m in range(nsteps):
         ax = fig.add_subplot(220 + fignum)
         im = ax.imshow(u.copy(), cmap=plt.get_cmap('hot'), vmin=Tcool,vmax=Thot)
         ax.set_axis_off()
-        ax.set_title('{:.1f} ms'.format(m*dt*1000))
+        #  ax.set_title('{:.1f} ms'.format(m*dt*1000))
 fig.subplots_adjust(right=0.85)
 cbar_ax = fig.add_axes([0.9, 0.15, 0.03, 0.7])
 cbar_ax.set_xlabel('$T$ / K', labelpad=20)

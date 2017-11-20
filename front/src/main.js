@@ -3,7 +3,7 @@ import $ from 'jquery';
 import 'babel-polyfill';
 
 import { getLayout } from './utils';
-import { DIFFUSION, LOCK_EXCHANGE } from "./datatype-constants";
+import { DIFFUSION, LOCK_EXCHANGE, CONVECTION, DIFF_CONV } from "./datatype-constants";
 
 Plotly.newPlot('plotlyDiv', [], {});
 
@@ -12,22 +12,22 @@ const renderer = {
     dataType : DIFFUSION, //0-diffusion 1-convaction 2-convection-diffusion 3-lock-exchange
     typeFile : [
         {
-            fileNames: ["diffusion.json", "gradient-diffusion.json"],
+            fileNames: ["diffusion", "gradient-diffusion"],
             canvasWidth: 500,
             canvasHeight: 500
         },
         {
-            fileNames: ["convection.json", "gradient-convection.json"],
+            fileNames: ["convection", "gradient-convection"],
             canvasWidth: 500,
             canvasHeight: 500
         },
         {
-            fileNames: ["convection-diffusion.json", "gradient-convection-diffusion.json"],
+            fileNames: ["convection-diffusion", "gradient-convection-diffusion"],
             canvasWidth: 500,
             canvasHeight: 500
         },
         {
-            fileNames: ["lock-exchange-993-nonB.json", "gradient-lock-exchange-993-nonB.json"],
+            fileNames: ["lock-exchange-993-nonB", "gradient-lock-exchange-993-nonB"],
             canvasWidth: 885,
             canvasHeight: 450
         },
@@ -44,6 +44,7 @@ const renderer = {
     }),
     canvas : document.getElementById('app'),
     ctx : document.getElementById('app').getContext('2d'),
+    arrow : '', //0-up 1-right 2-down 3-left
 
     init : function() {
         const typeFile = this.typeFile[this.dataType];
@@ -61,11 +62,11 @@ const renderer = {
         Plotly.relayout('plotlyDiv', layout);
 
         const fileNames = typeFile.fileNames;
-
-        fetch(fileNames[0]).then(response => response.json()).then(jsonData => {
+        console.log(fileNames[0] + this.arrow + '.json');
+        fetch(fileNames[0] + this.arrow + '.json').then(response => response.json()).then(jsonData => {
             this.vData['scalar'] = jsonData;
         });
-        return fetch(fileNames[1]).then(response => response.json()).then(jsonData => {
+        return fetch(fileNames[1] + this.arrow + '.json').then(response => response.json()).then(jsonData => {
             this.vData['gradient'] = jsonData['data'];
             this.setting['xGrad'] = jsonData['x_grad_max'];
             this.setting['yGrad'] = jsonData['y_grad_max'];
@@ -180,6 +181,20 @@ const renderer = {
         plotDiv.data = data;
         Plotly.redraw('plotlyDiv');
     },
+
+    //reset arrow
+    reSetArrow : function() {
+        if ((this.dataType === CONVECTION) || (this.dataType === DIFF_CONV)) {
+            this.arrow = 0;
+            $("#arrows").css('display', 'block');
+        } else {
+            this.arrow = '';
+            $("#arrows").css('display', 'none');
+        }
+    },
+
+    changeArrow : function(direction) {
+    },
 };
 
 (async function() {
@@ -210,6 +225,20 @@ $("#typeChange input").on("change", async function() {
             renderer.cyclePause();
         }
         renderer.dataType = datatype;
+        renderer.reSetArrow();
+        await renderer.init();
+        renderer.stepId = 0;
+        renderer.cycleInit();
+    }
+});
+
+$("#arrows a").on("click", async function() {
+    const nowArrow = $(this).attr('value');
+    if (nowArrow !== renderer.arrow) {
+        if (renderer.type === "cycle") {
+            renderer.cyclePause();
+        }
+        renderer.arrow = nowArrow;
         await renderer.init();
         renderer.stepId = 0;
         renderer.cycleInit();
