@@ -55,26 +55,6 @@ def do_down_timestep(u0, u, vx, vy):
 #timeSteps
 tSteps = 501
 
-# Output 4 figures at these timesteps
-#  mfig = [0, 40,100,150,200,250, 300,350,400]
-#  fignum = 0
-#  fig = plt.figure()
-#  for m in range(tSteps):
-    #  u0, u = do_down_timestep(u0, u, vx, vy)
-    #  if m % 10 == 0:
-        #  dataList.append(u.tolist())
-    #  if m in mfig:
-        #  fignum += 1
-        #  print(m, fignum)
-        #  ax = fig.add_subplot(330 + fignum)
-        #  im = ax.imshow(u.copy(), cmap=plt.get_cmap('hot'), vmin=Tcool,vmax=Thot)
-        #  ax.set_axis_off()
-        #  ax.set_title('{:.1f} ms'.format(m*dt*1000))
-#  fig.subplots_adjust(right=0.85)
-#  cbar_ax = fig.add_axes([0.9, 0.15, 0.03, 0.7])
-#  cbar_ax.set_xlabel('$T$ / K', labelpad=20)
-#  fig.colorbar(im, cax=cbar_ax)
-#  plt.show()
 
 for key, direction in enumerate(['left', 'down', 'right', 'up']):
     functionName = "do_" + direction + "_timestep"
