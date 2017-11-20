@@ -62,7 +62,7 @@ const renderer = {
         Plotly.relayout('plotlyDiv', layout);
 
         const fileNames = typeFile.fileNames;
-        console.log(fileNames[0] + this.arrow + '.json');
+        // console.log(fileNames[0] + this.arrow + '.json');
         fetch(fileNames[0] + this.arrow + '.json').then(response => response.json()).then(jsonData => {
             this.vData['scalar'] = jsonData;
         });
