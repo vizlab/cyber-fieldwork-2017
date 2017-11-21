@@ -10,6 +10,7 @@ Plotly.newPlot('plotlyDiv', [], {});
 const renderer = {
     type : "cycle", //0-cycle, 1-slider
     dataType : DIFFUSION, //0-diffusion 1-convaction 2-convection-diffusion 3-lock-exchange
+    D: 20,
     typeFile : [
         {
             fileNames: ["diffusion", "gradient-diffusion"],
@@ -229,6 +230,25 @@ $("#typeChange input").on("change", async function() {
         await renderer.init();
         renderer.stepId = 0;
         renderer.cycleInit();
+    }
+});
+
+$("#diffusionCoeff input").on("change", async function() {
+    const D = Number($("input[name='D']:checked").val());
+
+    if (D !== renderer.D && renderer.dataType !== CONVECTION && renderer.dataType !== LOCK_EXCHANGE) {
+        if (renderer.type === "cycle") {
+            renderer.cyclePause();
+        }
+        renderer.D = D;
+        renderer.reSetArrow();
+        await renderer.init();
+        renderer.stepId = 0;
+        renderer.cycleInit();
+    }
+
+    if (renderer.dataType === CONVECTION || renderer.dataType === LOCK_EXCHANGE) {
+        renderer.D = D;
     }
 });
 
