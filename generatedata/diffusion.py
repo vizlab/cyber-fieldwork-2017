@@ -2,7 +2,7 @@ import numpy as np
 import json, codecs
 
 #Thermal diffusivity of steel
-D = 4.
+D = 40.
 #plate size, mm
 w = h = 10.
 #intervals in x-, y- directions, mm
@@ -11,7 +11,8 @@ Tcool, Thot = 300, 700
 
 nx, ny = int(w/dx), int(h/dy)
 dx2, dy2 = dx*dx, dy*dy
-dt = dx2 * dy2 / (2 * D * (dx2 + dy2))
+dt = 0.0000625 # 0.0000625= (dx2 * dy2 / (2 * D * (dx2 + dy2))) / 10 when D = 4
+
 
 u0 = Tcool * np.ones((nx, ny))
 u = u0

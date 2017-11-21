@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 
 
 #Thermal diffusivity of steel
-D = 4.
+D = 40.
 #plate size, mm
 w = h = 10.
 #intervals in x-, y- directions, mm
@@ -13,7 +13,7 @@ Tcool, Thot = 300, 700
 
 nx, ny = int(w/dx), int(h/dy)
 dx2, dy2 = dx*dx, dy*dy
-dt = dx2 * dy2 / (2 * D * (dx2 + dy2))
+dt = 0.0000625 # 0.0000625= (dx2 * dy2 / (2 * D * (dx2 + dy2))) / 10 when D = 4
 
 # Initial conditions - ring of inner radius r, width dr centred at (cx,cy) (mm)
 r, cx, cy = 2, 5, 5
@@ -61,7 +61,7 @@ for key, direction in enumerate(['left', 'down', 'right', 'up']):
     u0 = Tcool * np.ones((nx, ny))
     u = u0
     vx = np.ones((nx, nx))* 0
-    vy = np.ones((ny, ny))* 10
+    vy = np.ones((ny, ny))* 100
     dataList = []
 
     for i in range(nx):
