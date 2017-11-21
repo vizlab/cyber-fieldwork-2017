@@ -63,7 +63,18 @@ const renderer = {
         Plotly.relayout('plotlyDiv', layout);
 
         const fileNames = typeFile.fileNames;
-        // console.log(fileNames[0] + this.arrow + '.json');
+
+        if (this.dataType === DIFFUSION || this.dataType === DIFF_CONV) {
+            fetch(fileNames[0] + this.arrow + 'D' + this.D + '.json').then(response => response.json()).then(jsonData => {
+                this.vData['scalar'] = jsonData;
+            });
+            return fetch(fileNames[1] + this.arrow + 'D' + this.D + '.json').then(response => response.json()).then(jsonData => {
+                this.vData['gradient'] = jsonData['data'];
+                this.setting['xGrad'] = jsonData['x_grad_max'];
+                this.setting['yGrad'] = jsonData['y_grad_max'];
+                this.setting['sampling_interval'] = jsonData['sampling_interval']
+            });
+        }
         fetch(fileNames[0] + this.arrow + '.json').then(response => response.json()).then(jsonData => {
             this.vData['scalar'] = jsonData;
         });
