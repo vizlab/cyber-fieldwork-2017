@@ -114,14 +114,36 @@
                                 <input type="radio" name="datatype" value="2">
                                 移流拡散方程式
                             </label>
+                            <label class="radio">
+                                <input type="radio" name="datatype" value="3">
+                                スパコンの結果
+                            </label>
                         </div>
                     </div>
                 </div>
+                <div class="field is-horizontal">
+                    <div class="field-label">
+                        拡散係数 D
+                    </div>
+                    <div class="field-body">
+                        <div id="diffusionCoeff" class="control">
+                            <label class="radio">
+                                <input type="radio" name="D" value="20"  checked="true">
+                                20
+                            </label>
+                            <label class="radio">
+                                <input type="radio" name="D" value="40">
+                                40
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
             </div>
-            <div class="column">
+            <div class="column" id="arrows" style="display:none">
                 移流方程式のベクトルの方向
                 <p class="field">
-                    <a class="button is-large" style="left: 120px">
+                    <a class="button is-large" style="left: 120px" value="0">
                         <span class="icon">
                             <i class="fa fa-arrow-up"></i>
                         </span>
@@ -130,14 +152,14 @@
 
                 <div class="field is-horizontal">
                     <p class="field">
-                        <a class="button is-large" style="left: 55px">
+                        <a class="button is-large" style="left: 55px" value="3">
                             <span class="icon">
                                 <i class="fa fa-arrow-left"></i>
                             </span>
                         </a>
                     </p>
                     <p class="field">
-                        <a class="button  is-large" style="left: 130px">
+                        <a class="button  is-large" style="left: 130px" value="1">
                             <span class="icon">
                                 <i class="fa fa-arrow-right"></i>
                             </span>
@@ -146,7 +168,7 @@
                 </div>
 
                 <p class="field">
-                    <a class="button is-large" style="left: 120px; top: -15px">
+                    <a class="button is-large" style="left: 120px; top: -15px" value="2">
                         <span class="icon">
                             <i class="fa fa-arrow-down"></i>
                         </span>
