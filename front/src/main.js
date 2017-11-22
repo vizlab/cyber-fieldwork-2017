@@ -122,7 +122,13 @@ const renderer = {
 
         for (let x = 0; x < NX; x++) {
             for (let y = 0; y < NY; y++) {
-                this.ctx.fillStyle = this.colors[parseInt(scalarField[x][y])];
+                const colorIdx = parseInt(scalarField[x][y]);
+                if (colorIdx < 0) {
+                    this.ctx.fillStyle = this.colors[0];
+                } else {
+                    this.ctx.fillStyle = this.colors[colorIdx];
+                }
+
                 this.ctx.fillRect(x * SCALE, this.canvas.height - y * SCALE, SCALE, SCALE);
             }
         }
