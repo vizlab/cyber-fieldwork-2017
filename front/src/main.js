@@ -123,7 +123,7 @@ const renderer = {
         for (let x = 0; x < NX; x++) {
             for (let y = 0; y < NY; y++) {
                 this.ctx.fillStyle = this.colors[parseInt(scalarField[x][y])];
-                this.ctx.fillRect(x * SCALE, y * SCALE, SCALE, SCALE);
+                this.ctx.fillRect(x * SCALE, this.canvas.height - y * SCALE, SCALE, SCALE);
             }
         }
 
@@ -136,8 +136,8 @@ const renderer = {
                 if (r < 1) {
                     continue;
                 }
-                const p0 = {x: x * samplingInterval * SCALE, y: y * samplingInterval  * SCALE};
-                const p1 = {x: (x * samplingInterval - r * Math.cos(theta)) * SCALE, y: (y * samplingInterval - r * Math.sin(theta)) * SCALE };
+                const p0 = {x: x * samplingInterval * SCALE, y: this.canvas.height - y * samplingInterval  * SCALE};
+                const p1 = {x: (x * samplingInterval - r * Math.cos(theta)) * SCALE, y: this.canvas.height - (y * samplingInterval - r * Math.sin(theta)) * SCALE };
                 this.drawLineWithArrowhead(p0, p1, 3, this.ctx);
             }
         }
