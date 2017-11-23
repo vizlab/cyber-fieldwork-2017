@@ -53,7 +53,7 @@ const renderer = {
         this.canvas.height = typeFile.canvasHeight;
 
         this.colors = colormap({
-            colormap: 'jet',
+            colormap: (this.dataType === LOCK_EXCHANGE) ? 'jet' : 'RdBu',
             nshades: (this.dataType === LOCK_EXCHANGE) ? 110 : 701,
             format: 'hex',
             alpha: 1
@@ -135,7 +135,7 @@ const renderer = {
 
         for (let x = 0; x < NX / samplingInterval; x++) {
             for (let y = 0; y < NY / samplingInterval; y++) {
-                const xGrad = gradientField.x[x][y];
+                const xGrad = (this.dataType !== LOCK_EXCHANGE) ? gradientField.x[x][y] : -gradientField.x[x][y];
                 const yGrad = - gradientField.y[x][y];
                 const theta = - Math.atan2(yGrad, xGrad);
                 const r = 50 * Math.sqrt(Math.pow(xGrad / xGradMax,2) + Math.pow(yGrad / yGradMax,2));
