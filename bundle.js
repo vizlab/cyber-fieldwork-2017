@@ -3781,7 +3781,7 @@ var renderer = {
         this.canvas.height = typeFile.canvasHeight;
 
         this.colors = (0, _colormap2.default)({
-            colormap: 'jet',
+            colormap: this.dataType === _datatypeConstants.LOCK_EXCHANGE ? 'jet' : 'RdBu',
             nshades: this.dataType === _datatypeConstants.LOCK_EXCHANGE ? 110 : 701,
             format: 'hex',
             alpha: 1
@@ -3860,22 +3860,28 @@ var renderer = {
 
         for (var x = 0; x < NX; x++) {
             for (var y = 0; y < NY; y++) {
-                this.ctx.fillStyle = this.colors[parseInt(scalarField[x][y])];
-                this.ctx.fillRect(x * SCALE, y * SCALE, SCALE, SCALE);
+                var colorIdx = parseInt(scalarField[x][y]);
+                if (colorIdx < 0) {
+                    this.ctx.fillStyle = this.colors[0];
+                } else {
+                    this.ctx.fillStyle = this.colors[colorIdx];
+                }
+
+                this.ctx.fillRect(x * SCALE, this.canvas.height - y * SCALE, SCALE, SCALE);
             }
         }
 
         for (var _x = 0; _x < NX / samplingInterval; _x++) {
             for (var _y = 0; _y < NY / samplingInterval; _y++) {
-                var xGrad = gradientField.x[_x][_y];
+                var xGrad = this.dataType !== _datatypeConstants.LOCK_EXCHANGE ? gradientField.x[_x][_y] : -gradientField.x[_x][_y];
                 var yGrad = -gradientField.y[_x][_y];
                 var theta = -Math.atan2(yGrad, xGrad);
                 var r = 50 * Math.sqrt(Math.pow(xGrad / xGradMax, 2) + Math.pow(yGrad / yGradMax, 2));
                 if (r < 1) {
                     continue;
                 }
-                var p0 = { x: _x * samplingInterval * SCALE, y: _y * samplingInterval * SCALE };
-                var p1 = { x: (_x * samplingInterval - r * Math.cos(theta)) * SCALE, y: (_y * samplingInterval - r * Math.sin(theta)) * SCALE };
+                var p0 = { x: _x * samplingInterval * SCALE, y: this.canvas.height - _y * samplingInterval * SCALE };
+                var p1 = { x: (_x * samplingInterval - r * Math.cos(theta)) * SCALE, y: this.canvas.height - (_y * samplingInterval - r * Math.sin(theta)) * SCALE };
                 this.drawLineWithArrowhead(p0, p1, 3, this.ctx);
             }
         }
